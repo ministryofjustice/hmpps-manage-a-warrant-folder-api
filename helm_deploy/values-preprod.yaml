@@ -3,7 +3,7 @@
 
 generic-service:
   ingress:
-    host: hmpps-manage-a-warrant-folder-api-preprod.hmpps.service.justice.gov.uk
+    host: manage-a-warrant-folder-api-preprod.hmpps.service.justice.gov.uk
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
