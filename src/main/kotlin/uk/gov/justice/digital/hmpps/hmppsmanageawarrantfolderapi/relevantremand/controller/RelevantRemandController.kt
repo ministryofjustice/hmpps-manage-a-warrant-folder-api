@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.calculatereleasedatesapi.service.PrisonService
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.transform
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.service.PrisonService
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.transform.transform
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service.RemandCalculationService
 

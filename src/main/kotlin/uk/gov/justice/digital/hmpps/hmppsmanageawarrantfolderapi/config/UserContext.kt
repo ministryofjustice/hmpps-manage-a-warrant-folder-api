@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.calculatereleasedatesapi.config
+package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.config
 
 import org.springframework.stereotype.Component
 

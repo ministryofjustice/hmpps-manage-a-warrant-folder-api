@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.ExchangeFunction
 import org.springframework.web.reactive.function.client.WebClient
-import uk.gov.justice.digital.hmpps.calculatereleasedatesapi.config.UserContext
 
 @Configuration
 class WebClientConfiguration(

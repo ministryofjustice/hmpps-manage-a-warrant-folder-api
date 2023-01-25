@@ -4,9 +4,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import javax.validation.ValidationException
 
 @RestControllerAdvice
@@ -20,6 +22,20 @@ class HmppsManageAWarrantFolderApiExceptionHandler {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Validation failure: ${e.message}",
+          developerMessage = e.message
+        )
+      )
+  }
+
+  @ExceptionHandler(UnsupportedCalculationException::class)
+  fun handleUnsupportedCalculationException(e: UnsupportedCalculationException): ResponseEntity<ErrorResponse> {
+    log.error("UnsupportedCalculationException ${e.message}", e)
+    return ResponseEntity
+      .status(UNPROCESSABLE_ENTITY)
+      .body(
+        ErrorResponse(
+          status = UNPROCESSABLE_ENTITY,
+          userMessage = e.message,
           developerMessage = e.message
         )
       )

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi
+package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service.RemandCalculationService
 import java.time.LocalDate
 
 class RemandCalculationServiceTest {
@@ -78,6 +77,29 @@ class RemandCalculationServiceTest {
       assertThat(result[0].days).isEqualTo(31)
     }
 
+    @Test
+    fun `Remand is with start and stop event with court dates in the wrong order`() {
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          aCharge(
+            listOf(
+              CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP),
+              CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START)
+            )
+          )
+        )
+      )
+      assertThat(result).isEqualTo(
+        listOf(
+          Remand(
+            LocalDate.of(2022, 1, 1),
+            LocalDate.of(2022, 1, 31),
+            SENTENCE_SEQUENCE
+          )
+        )
+      )
+      assertThat(result[0].days).isEqualTo(31)
+    }
     @Test
     fun `Remand preprod example `() {
       val result = remandCalculationService.calculate(

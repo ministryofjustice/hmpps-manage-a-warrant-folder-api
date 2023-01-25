@@ -21,6 +21,8 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-kotlin:1.6.13")
 
   // Test deps
+  testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
+  testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.1.8")
 }
 

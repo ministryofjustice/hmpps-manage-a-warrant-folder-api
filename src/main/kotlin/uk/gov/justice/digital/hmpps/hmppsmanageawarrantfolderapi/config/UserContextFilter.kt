@@ -1,8 +1,9 @@
-package uk.gov.justice.digital.hmpps.calculatereleasedatesapi.config
+package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.config
 
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.config.UserContext
 import java.io.IOException
 import javax.servlet.Filter
 import javax.servlet.FilterChain

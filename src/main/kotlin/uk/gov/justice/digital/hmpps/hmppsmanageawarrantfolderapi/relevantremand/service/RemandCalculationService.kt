@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service
 
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
 import java.time.LocalDate
 
+@Service
 class RemandCalculationService {
 
   fun calculate(remandCalculation: RemandCalculation): List<Remand> {
@@ -18,16 +20,19 @@ class RemandCalculationService {
 
     val charge = remandCalculation.charges[0]
 
-    charge.courtDates.sortedBy { it.date }
+    val sortedDates = charge.courtDates.sortedBy { it.date }
 
-    if (charge.courtDates.any { it.type == CourtDateType.START }) {
+    if (sortedDates.any { it.type == CourtDateType.START }) {
       var from: LocalDate? = null
       var remand = mutableListOf<Remand>()
-      charge.courtDates.forEach {
+      sortedDates.forEach {
         if (it.type == CourtDateType.START && from == null) {
           from = it.date
         }
         if (it.type == CourtDateType.STOP && from != null) {
+          if (charge.sentenceSequence == null) {
+            throw UnsupportedCalculationException("A charge should have remand, but no sentence has been added yet")
+          }
           remand.add(Remand(from!!, it.date.minusDays(1), charge.sentenceSequence))
           from = null
         }

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.calculatereleasedatesapi.service
+package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.hmpps.prison.api.model.digitalwarrant.PrisonApiCourtDateResult
