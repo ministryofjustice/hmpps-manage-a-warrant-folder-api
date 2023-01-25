@@ -22,9 +22,9 @@ class RemandCalculationService {
 
     val sortedDates = charge.courtDates.sortedBy { it.date }
 
+    val remand = mutableListOf<Remand>()
     if (sortedDates.any { it.type == CourtDateType.START }) {
       var from: LocalDate? = null
-      var remand = mutableListOf<Remand>()
       sortedDates.forEach {
         if (it.type == CourtDateType.START && from == null) {
           from = it.date
@@ -37,9 +37,7 @@ class RemandCalculationService {
           from = null
         }
       }
-      return remand
-    } else {
-      return emptyList()
     }
+    return remand
   }
 }
