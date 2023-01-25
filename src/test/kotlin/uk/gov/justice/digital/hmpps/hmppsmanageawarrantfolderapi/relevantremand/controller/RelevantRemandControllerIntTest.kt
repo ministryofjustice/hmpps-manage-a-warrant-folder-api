@@ -16,7 +16,7 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
     val result = webTestClient.post()
       .uri("/relevant-remand/${PrisonApiExtension.PRISONER_ID}")
       .accept(MediaType.APPLICATION_JSON)
-      .headers(setAuthorisation(roles = listOf("ROLE_RELEASE_DATES_CALCULATOR")))
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGE_DIGITAL_WARRANT")))
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
