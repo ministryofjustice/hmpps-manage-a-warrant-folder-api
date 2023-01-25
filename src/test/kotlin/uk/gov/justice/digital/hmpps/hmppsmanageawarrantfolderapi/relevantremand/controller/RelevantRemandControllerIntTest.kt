@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.controller
 
-
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.core.ParameterizedTypeReference
@@ -25,13 +24,15 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
       .returnResult().responseBody
 
     assertThat(result).isNotEmpty
-    assertThat(result).isEqualTo(listOf(Remand(
-      from = LocalDate.of(2022, 10, 13),
-      to = LocalDate.of(2022, 12, 12),
-      sentence = 1
-    )))
+    assertThat(result).isEqualTo(
+      listOf(
+        Remand(
+          from = LocalDate.of(2022, 10, 13),
+          to = LocalDate.of(2022, 12, 12),
+          sentence = 1
+        )
+      )
+    )
     assertThat(result!![0].days).isEqualTo(61)
   }
-
-
 }

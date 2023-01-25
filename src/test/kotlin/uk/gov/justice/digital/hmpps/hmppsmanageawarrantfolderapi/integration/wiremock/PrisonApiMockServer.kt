@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.wi
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
@@ -48,7 +47,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody("""
+            .withBody(
+              """
               [
                  {
                     "id":1,
@@ -83,7 +83,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                     "bookingId":1
                  }
               ]=
-            """.trimIndent())
+              """.trimIndent()
+            )
             .withStatus(200)
         )
     )
