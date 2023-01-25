@@ -1,8 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,28 +21,28 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 
 @RestController
 @RequestMapping("/relevant-remand", produces = [MediaType.APPLICATION_JSON_VALUE])
-// @Tag(name = "calculation-controller", description = "Operations involving a calculation")
+@Tag(name = "relevant-remand-controller", description = "Operations involving a calculating relevant remand")
 class RelevantRemandController(
   private val remandCalculationService: RemandCalculationService,
   private val prisonService: PrisonService
 ) {
   @PostMapping(value = ["/{prisonerId}"])
-//  @PreAuthorize("hasAnyRole('SYSTEM_USER', 'RELEASE_DATES_CALCULATOR')")
+  @PreAuthorize("hasAnyRole('SYSTEM_USER', 'MANAGE_DIGITAL_WARRANT')")
   @ResponseBody
-//  @Operation(
-//    summary = "Calculate release dates for a prisoner - preliminary calculation, this does not publish to NOMIS",
-//    description = "This endpoint will calculate release dates based on a prisoners latest booking - this is a " +
-//      "PRELIMINARY calculation that will not be published to NOMIS"
-//  )
-//  @ApiResponses(
-//    value = [
-//      ApiResponse(responseCode = "200", description = "Returns calculated dates"),
-//      ApiResponse(responseCode = "401", description = "Unauthorised, requires a valid Oauth2 token"),
-//      ApiResponse(responseCode = "403", description = "Forbidden, requires an appropriate role")
-//    ]
-//  )
+  @Operation(
+    summary = "Calculates relevant remand",
+    description = "This endpoint will calculate relevant remand based on the data from NOMIS before returning it to" +
+      " the user"
+  )
+  @ApiResponses(
+    value = [
+      ApiResponse(responseCode = "200", description = "Returns calculated relevant remand"),
+      ApiResponse(responseCode = "401", description = "Unauthorised, requires a valid Oauth2 token"),
+      ApiResponse(responseCode = "403", description = "Forbidden, requires an appropriate role")
+    ]
+  )
   fun calculate(
-//    @Parameter(required = true, example = "A1234AB", description = "The prisoners ID (aka nomsId)")
+    @Parameter(required = true, example = "A1234AB", description = "The prisoners ID (aka nomsId)")
     @PathVariable("prisonerId")
     prisonerId: String
   ): List<Remand> {
