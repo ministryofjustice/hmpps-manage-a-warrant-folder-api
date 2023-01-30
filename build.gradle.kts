@@ -1,6 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.5.4"
-  kotlin("plugin.spring") version "1.7.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.7.4"
+  id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
+  kotlin("plugin.spring") version "1.7.22"
+  id("jacoco")
 }
 
 configurations {
@@ -27,7 +29,7 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(18))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
 }
 
 tasks {
@@ -36,4 +38,8 @@ tasks {
       jvmTarget = "18"
     }
   }
+}
+
+dependencyCheck {
+  suppressionFiles.add("$rootDir/dependencyCheck/suppression.xml")
 }
