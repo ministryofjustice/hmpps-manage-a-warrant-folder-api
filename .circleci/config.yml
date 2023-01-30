@@ -1,21 +1,21 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@6.0
+  hmpps: ministryofjustice/hmpps@6
 
 parameters:
   alerts-slack-channel:
     type: string
-    default: dps_alerts_security
+    default: farsight-alerts
   releases-slack-channel:
     type: string
-    default: dps-releases
+    default: farsight-alerts
 
 jobs:
   validate:
     executor:
       name: hmpps/java
-      tag: "17.0"
+      tag: "19.0"
     steps:
       - checkout
       - restore_cache:
