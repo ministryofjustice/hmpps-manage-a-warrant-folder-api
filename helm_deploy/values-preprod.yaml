@@ -2,6 +2,8 @@
 # Per environment values which override defaults in hmpps-manage-a-warrant-folder-api/values.yaml
 
 generic-service:
+  replicaCount: 2
+
   ingress:
     host: manage-a-warrant-folder-api-preprod.hmpps.service.justice.gov.uk
 
