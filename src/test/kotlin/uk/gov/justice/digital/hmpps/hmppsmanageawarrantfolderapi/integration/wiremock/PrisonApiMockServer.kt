@@ -53,6 +53,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                     "date":"2022-10-13",
                     "resultCode":"4531",
                     "resultDescription":"Remand in Custody (Bail Refused)",
+                    "resultDispositionCode": "I",
                     "charge":{
                        "chargeId":1,
                        "offenceCode":"SX03163A",
@@ -69,6 +70,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                     "date":"2022-12-13",
                     "resultCode":"1002",
                     "resultDescription":"Imprisonment",
+                    "resultDispositionCode": "F",
                     "charge":{
                        "chargeId":1,
                        "offenceCode":"SX03163A",
