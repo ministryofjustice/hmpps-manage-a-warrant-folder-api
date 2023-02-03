@@ -8,8 +8,6 @@ import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /*
     This class mocks the prison-api.
@@ -18,13 +16,13 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
   companion object {
     @JvmField
     val prisonApi = PrisonApiMockServer()
-    const val DEFAULT = "default"
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
-    public const val PRISONER_ID = "ABCD"
+    const val IMPRISONED_PRISONER = "IMP"
+    const val BAIL_PRISONER = "BAIL"
   }
   override fun beforeAll(context: ExtensionContext) {
     prisonApi.start()
-    prisonApi.stubCourtCaseResults()
+    prisonApi.stubImprisonedCourtCaseResults()
+    prisonApi.stubBailPrisoner()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -41,9 +39,9 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
     private const val WIREMOCK_PORT = 8332
   }
 
-  fun stubCourtCaseResults(): StubMapping =
+  fun stubImprisonedCourtCaseResults(): StubMapping =
     stubFor(
-      get("/api/digital-warrant/court-date-results/${PrisonApiExtension.PRISONER_ID}")
+      get("/api/digital-warrant/court-date-results/${PrisonApiExtension.IMPRISONED_PRISONER}")
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
@@ -82,7 +80,73 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                     },
                     "bookingId":1
                  }
-              ]=
+              ]
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  fun stubBailPrisoner(): StubMapping =
+    stubFor(
+      get("/api/digital-warrant/court-date-results/${PrisonApiExtension.BAIL_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+              [
+                 {
+                    "id":1,
+                    "date":"2015-03-25",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode": "I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":2,
+                    "date":"2015-04-08",
+                    "resultCode":"4530",
+                    "resultDescription":"Remand on Conditional Bail",
+                    "resultDispositionCode": "I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":3,
+                    "date":"2015-09-18",
+                    "resultCode":"1002",
+                    "resultDescription":"Imprisonment",
+                    "resultDispositionCode": "F",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
+                 }
+              ]
               """.trimIndent()
             )
             .withStatus(200)
