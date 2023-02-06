@@ -4,5 +4,6 @@ import java.time.LocalDate
 
 data class CourtDate(
   val date: LocalDate,
-  val type: CourtDateType
+  val type: CourtDateType,
+  val final: Boolean = false
 )

@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.transform
 
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonApiCharge
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonApiCourtDateResult
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
-import uk.gov.justice.hmpps.prison.api.model.digitalwarrant.PrisonApiCourtDateResult
 
 fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
   return RemandCalculation(
@@ -30,7 +30,8 @@ private fun transform(prisonApiCharge: PrisonApiCharge): Offence {
 private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): CourtDate {
   return CourtDate(
     courtDateResult.date!!,
-    transformToType(courtDateResult)
+    transformToType(courtDateResult),
+    courtDateResult.resultDispositionCode == "F"
   )
 }
 
@@ -50,6 +51,7 @@ private fun transformToType(courtDateResult: PrisonApiCourtDateResult): CourtDat
     "4506" -> CourtDateType.CONTINUE
     "1510" -> CourtDateType.CONTINUE
     "1116" -> CourtDateType.STOP
+    "4530" -> CourtDateType.STOP
     else -> {
       throw UnsupportedCalculationException("${courtDateResult.resultCode}: ${courtDateResult.resultDescription} is unsupported")
     }

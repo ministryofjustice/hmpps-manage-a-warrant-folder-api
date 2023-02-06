@@ -54,13 +54,13 @@ class RemandCalculationServiceTest {
     }
 
     @Test
-    fun `Remand is with start and stop event`() {
+    fun `Remand is with start and final stop event`() {
       val result = remandCalculationService.calculate(
         RemandCalculation(
           aCharge(
             listOf(
               CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START),
-              CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP)
+              CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP, true)
             )
           )
         )
@@ -78,12 +78,12 @@ class RemandCalculationServiceTest {
     }
 
     @Test
-    fun `Remand is with start and stop event with court dates in the wrong order`() {
+    fun `Remand is with start and final stop event with court dates in the wrong order`() {
       val result = remandCalculationService.calculate(
         RemandCalculation(
           aCharge(
             listOf(
-              CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP),
+              CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP, true),
               CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START)
             )
           )
@@ -107,7 +107,7 @@ class RemandCalculationServiceTest {
           aCharge(
             listOf(
               CourtDate(LocalDate.of(2021, 5, 13), CourtDateType.START),
-              CourtDate(LocalDate.of(2021, 5, 14), CourtDateType.STOP)
+              CourtDate(LocalDate.of(2021, 5, 14), CourtDateType.STOP, true)
             )
           )
         )
@@ -122,6 +122,31 @@ class RemandCalculationServiceTest {
         )
       )
       assertThat(result[0].days).isEqualTo(1)
+    }
+    @Test
+    fun `Remand with bail (not final stop)`() {
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          aCharge(
+            listOf(
+              CourtDate(LocalDate.of(2015, 3, 25), CourtDateType.START),
+              CourtDate(LocalDate.of(2015, 4, 8), CourtDateType.STOP),
+              CourtDate(LocalDate.of(2015, 9, 18), CourtDateType.STOP, true)
+
+            )
+          )
+        )
+      )
+      assertThat(result).isEqualTo(
+        listOf(
+          Remand(
+            LocalDate.of(2015, 3, 25),
+            LocalDate.of(2015, 4, 8),
+            SENTENCE_SEQUENCE
+          )
+        )
+      )
+      assertThat(result[0].days).isEqualTo(15)
     }
   }
 
