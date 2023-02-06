@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
@@ -20,13 +21,15 @@ class RemandCalculationService {
     }
 
     val charge = remandCalculation.charges[0]
-
     val sortedDates = charge.courtDates.sortedBy { it.date }
+    return remandClock(charge, sortedDates)
+  }
 
+  private fun remandClock(charge: Charge, dates: List<CourtDate>): List<Remand> {
     val remand = mutableListOf<Remand>()
-    if (hasAnyRemandEvent(sortedDates)) {
+    if (hasAnyRemandEvent(dates)) {
       var from: LocalDate? = null
-      sortedDates.forEach {
+      dates.forEach {
         if (it.type == CourtDateType.START && from == null) {
           from = it.date
         }
