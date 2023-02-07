@@ -37,21 +37,23 @@ private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): Cou
 
 private fun transformToType(courtDateResult: PrisonApiCourtDateResult): CourtDateType {
   return when (courtDateResult.resultCode) {
-    "1002" -> CourtDateType.STOP
     "4531" -> CourtDateType.START
     "4560" -> CourtDateType.START
     "4565" -> CourtDateType.START
-    "1501" -> CourtDateType.STOP
     "4004" -> CourtDateType.START
     "4016" -> CourtDateType.START
-    "4012" -> CourtDateType.CONTINUE
     "4001" -> CourtDateType.START
-    "5500" -> CourtDateType.CONTINUE
+    "1501" -> CourtDateType.STOP
     "1115" -> CourtDateType.STOP
-    "4506" -> CourtDateType.CONTINUE
-    "1510" -> CourtDateType.CONTINUE
     "1116" -> CourtDateType.STOP
     "4530" -> CourtDateType.STOP
+    "1002" -> CourtDateType.STOP
+    "4572" -> CourtDateType.CONTINUE
+    "4506" -> CourtDateType.CONTINUE
+    "1510" -> CourtDateType.CONTINUE
+    "5500" -> CourtDateType.CONTINUE
+    "4012" -> CourtDateType.CONTINUE
+    "G" -> CourtDateType.CONTINUE
     else -> {
       throw UnsupportedCalculationException("${courtDateResult.resultCode}: ${courtDateResult.resultDescription} is unsupported")
     }
