@@ -67,6 +67,23 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                  },
                  {
                     "id":2,
+                    "date":"2022-10-16",
+                    "resultCode":"G",
+                    "resultDescription":"Guilty",
+                    "resultDispositionCode": "I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":3,
                     "date":"2022-12-13",
                     "resultCode":"1002",
                     "resultDescription":"Imprisonment",
