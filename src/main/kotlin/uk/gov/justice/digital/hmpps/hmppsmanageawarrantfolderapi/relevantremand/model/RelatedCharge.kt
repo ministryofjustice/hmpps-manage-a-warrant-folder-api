@@ -2,11 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 import java.time.LocalDate
 
-data class Charge(
-  val chargeId: Long,
-  val offence: Offence,
+data class RelatedCharge(
   val offenceDate: LocalDate,
   val offenceEndDate: LocalDate?,
-  val sentenceSequence: Int?,
-  val courtDates: List<CourtDate>
+  val offenceCode: String
 )
