@@ -18,11 +18,13 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
     val prisonApi = PrisonApiMockServer()
     const val IMPRISONED_PRISONER = "IMP"
     const val BAIL_PRISONER = "BAIL"
+    const val RELATED_PRISONER = "RELATED"
   }
   override fun beforeAll(context: ExtensionContext) {
     prisonApi.start()
     prisonApi.stubImprisonedCourtCaseResults()
     prisonApi.stubBailPrisoner()
+    prisonApi.stubRelatedOffencesPrisoner()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -164,6 +166,72 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "sentenceSequence":1
                     },
                     "bookingId":1
+                 }
+              ]
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  fun stubRelatedOffencesPrisoner(): StubMapping =
+    stubFor(
+      get("/api/digital-warrant/court-date-results/${PrisonApiExtension.RELATED_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+              [
+                 {
+                    "id":1,
+                    "date":"2015-03-20",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode": "I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":2,
+                    "date":"2015-04-10",
+                    "resultCode":"4530",
+                    "resultDescription":"Remand on Conditional Bail",
+                    "resultDispositionCode": "I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":3,
+                    "date":"2015-09-25",
+                    "resultCode":"1002",
+                    "resultDescription":"Imprisonment",
+                    "resultDispositionCode": "F",
+                    "charge":{
+                       "chargeId":3,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":"2021-05-05",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":3
                  }
               ]
               """.trimIndent()

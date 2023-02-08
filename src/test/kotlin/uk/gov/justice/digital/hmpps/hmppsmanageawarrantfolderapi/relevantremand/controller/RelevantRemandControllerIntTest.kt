@@ -59,4 +59,28 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
     )
     assertThat(result!![0].days).isEqualTo(15)
   }
+  @Test
+  fun `Run calculation for a prisoner with related offences`() {
+    val result = webTestClient.post()
+      .uri("/relevant-remand/${PrisonApiExtension.RELATED_PRISONER}")
+      .accept(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGE_DIGITAL_WARRANT")))
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody(object : ParameterizedTypeReference<List<Remand>>() {})
+      .returnResult().responseBody
+
+    assertThat(result).isNotEmpty
+    assertThat(result).isEqualTo(
+      listOf(
+        Remand(
+          from = LocalDate.of(2015, 3, 20),
+          to = LocalDate.of(2015, 4, 10),
+          sentence = 1
+        )
+      )
+    )
+    assertThat(result!![0].days).isEqualTo(22)
+  }
 }

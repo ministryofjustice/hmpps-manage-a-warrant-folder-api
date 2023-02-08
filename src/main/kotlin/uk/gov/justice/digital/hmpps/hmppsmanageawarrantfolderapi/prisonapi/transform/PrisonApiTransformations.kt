@@ -16,6 +16,8 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
         Charge(
           it.key,
           transform(it.value.first().charge),
+          it.value.first().charge.offenceDate,
+          it.value.first().charge.offenceEndDate,
           it.value.first().charge.sentenceSequence,
           it.value.map { result -> transformToCourtDate(result) }
         )
