@@ -13,12 +13,16 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
   return RemandCalculation(
     results.groupBy { it.charge.chargeId }
       .map {
+        val charge = it.value.first().charge
+        if (charge.offenceDate == null) {
+          throw UnsupportedCalculationException("The charge ${charge.chargeId} has no offence date.")
+        }
         Charge(
           it.key,
-          transform(it.value.first().charge),
-          it.value.first().charge.offenceDate,
-          it.value.first().charge.offenceEndDate,
-          it.value.first().charge.sentenceSequence,
+          transform(charge),
+          charge.offenceDate,
+          charge.offenceEndDate,
+          charge.sentenceSequence,
           it.value.map { result -> transformToCourtDate(result) }
         )
       }
@@ -38,6 +42,9 @@ private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): Cou
 }
 
 private fun transformToType(courtDateResult: PrisonApiCourtDateResult): CourtDateType {
+  if (courtDateResult.resultCode == null) {
+    throw UnsupportedCalculationException("The court event ${courtDateResult.id} has no outcome.")
+  }
   return when (courtDateResult.resultCode) {
     "4531" -> CourtDateType.START
     "4560" -> CourtDateType.START
