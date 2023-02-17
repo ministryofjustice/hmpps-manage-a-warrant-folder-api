@@ -38,6 +38,9 @@ private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): Cou
 }
 
 private fun transformToType(courtDateResult: PrisonApiCourtDateResult): CourtDateType {
+  if (courtDateResult.resultCode == null) {
+    throw UnsupportedCalculationException("The court event ${courtDateResult.id} has no outcome.")
+  }
   return when (courtDateResult.resultCode) {
     "4531" -> CourtDateType.START
     "4560" -> CourtDateType.START
