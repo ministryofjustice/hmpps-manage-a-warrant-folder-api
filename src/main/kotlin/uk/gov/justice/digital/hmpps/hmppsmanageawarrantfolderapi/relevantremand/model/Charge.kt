@@ -8,5 +8,6 @@ data class Charge(
   val offenceDate: LocalDate,
   val offenceEndDate: LocalDate?,
   val sentenceSequence: Int?,
+  val courtCaseRef: String?,
   val courtDates: List<CourtDate>
 )

@@ -19,12 +19,14 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
     const val IMPRISONED_PRISONER = "IMP"
     const val BAIL_PRISONER = "BAIL"
     const val RELATED_PRISONER = "RELATED"
+    const val MULTIPLE_OFFENCES_PRISONER = "MULTI"
   }
   override fun beforeAll(context: ExtensionContext) {
     prisonApi.start()
     prisonApi.stubImprisonedCourtCaseResults()
     prisonApi.stubBailPrisoner()
     prisonApi.stubRelatedOffencesPrisoner()
+    prisonApi.stubMultipleOffences()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -61,6 +63,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -78,6 +81,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -95,6 +99,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -127,6 +132,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -144,6 +150,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -161,6 +168,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -193,6 +201,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -210,6 +219,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
@@ -227,11 +237,576 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
                        "offenceDate":"2021-05-05",
+                       "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
                        "sentenceSequence":1
                     },
                     "bookingId":3
+                 }
+              ]
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+
+  fun stubMultipleOffences(): StubMapping =
+    stubFor(
+      get("/api/digital-warrant/court-date-results/${PrisonApiExtension.MULTIPLE_OFFENCES_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+              [
+                 {
+                    "id":1,
+                    "date":"2019-07-06",
+                    "resultCode":"4560",
+                    "resultDescription":"Commit/Transfer/Send to Crown Court for Trial in Custody",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":1,
+                    "date":"2019-07-06",
+                    "resultCode":"4560",
+                    "resultDescription":"Commit/Transfer/Send to Crown Court for Trial in Custody",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "offenceDescription": "An other offence",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":2,
+                    "date":"2019-07-06",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":3,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "offenceDescription": "An offence",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":2,
+                    "date":"2019-07-06",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":4,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":2
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":3,
+                    "date":"2019-08-05",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":3,
+                    "date":"2019-08-05",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":4,
+                    "date":"2019-08-13",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":4,
+                    "date":"2019-08-13",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":5,
+                    "date":"2019-08-27",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":5,
+                    "date":"2019-08-27",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":6,
+                    "date":"2019-10-28",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":6,
+                    "date":"2019-10-28",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":7,
+                    "date":"2020-01-14",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":7,
+                    "date":"2020-01-14",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":8,
+                    "date":"2020-02-06",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":8,
+                    "date":"2020-02-06",
+                    "resultCode":"4565",
+                    "resultDescription":"Commit to Crown Court for Trial (Summary / Either Way Offences)",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":9,
+                    "date":"2020-02-10",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":9,
+                    "date":"2020-02-10",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":10,
+                    "date":"2020-02-20",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":10,
+                    "date":"2020-02-20",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":11,
+                    "date":"2020-09-11",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":11,
+                    "date":"2020-09-11",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":12,
+                    "date":"2020-09-24",
+                    "resultCode":"4015",
+                    "resultDescription":"Commit to Crown Court for Sentence Conditional Bail",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":12,
+                    "date":"2020-09-24",
+                    "resultCode":"4015",
+                    "resultDescription":"Commit to Crown Court for Sentence Conditional Bail",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":2,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-07-05",
+                       "guilty":false,
+                       "courtCaseId":1
+                    },
+                    "bookingId":1
+                 },
+                 {
+                    "id":13,
+                    "date":"2020-09-24",
+                    "resultCode":"4015",
+                    "resultDescription":"Commit to Crown Court for Sentence Conditional Bail",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":3,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":13,
+                    "date":"2020-09-24",
+                    "resultCode":"4015",
+                    "resultDescription":"Commit to Crown Court for Sentence Conditional Bail",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":4,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":2
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":14,
+                    "date":"2021-06-14",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":3,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":14,
+                    "date":"2021-06-14",
+                    "resultCode":"4004",
+                    "resultDescription":"Sentence Postponed",
+                    "resultDispositionCode":"I",
+                    "charge":{
+                       "chargeId":4,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":2
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":15,
+                    "date":"2021-06-15",
+                    "resultCode":"1002",
+                    "resultDescription":"Imprisonment",
+                    "resultDispositionCode":"F",
+                    "charge":{
+                       "chargeId":3,
+                       "offenceCode":"MD71130C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":2
+                 },
+                 {
+                    "id":15,
+                    "date":"2021-06-15",
+                    "resultCode":"1002",
+                    "resultDescription":"Imprisonment",
+                    "resultDispositionCode":"F",
+                    "charge":{
+                       "chargeId":4,
+                       "offenceCode":"MD71145C",
+                       "offenceStatue":"MD71",
+                       "offenceDescription": "An other offence",
+                       "offenceDate":"2019-05-01",
+                       "offenceEndDate":"2019-05-21",
+                       "guilty":false,
+                       "courtCaseId":2,
+                       "sentenceSequence":2
+                    },
+                    "bookingId":2
                  }
               ]
               """.trimIndent()

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.service.PrisonService
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.transform.transform
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service.RemandCalculationService
 
 @RestController
@@ -45,7 +45,7 @@ class RelevantRemandController(
     @Parameter(required = true, example = "A1234AB", description = "The prisoners ID (aka nomsId)")
     @PathVariable("prisonerId")
     prisonerId: String
-  ): List<Remand> {
+  ): RemandResult {
     log.info("Request received to calculate relevant remand for $prisonerId")
     val courtDateResults = prisonService.getCourtDateResults(prisonerId)
     return remandCalculationService.calculate(transform(courtDateResults))
