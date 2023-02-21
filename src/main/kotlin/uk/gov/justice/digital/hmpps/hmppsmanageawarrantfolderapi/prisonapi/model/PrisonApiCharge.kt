@@ -8,7 +8,9 @@ data class PrisonApiCharge(
   val offenceStatue: String,
   val offenceDate: LocalDate?,
   val offenceEndDate: LocalDate?,
+  val offenceDescription: String,
   val guilty: Boolean,
   val courtCaseId: Long,
+  val courtCaseRef: String?,
   val sentenceSequence: Int?
 )

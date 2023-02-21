@@ -23,6 +23,7 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
           charge.offenceDate,
           charge.offenceEndDate,
           charge.sentenceSequence,
+          charge.courtCaseRef,
           it.value.map { result -> transformToCourtDate(result) }
         )
       }
@@ -30,7 +31,7 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
 }
 
 private fun transform(prisonApiCharge: PrisonApiCharge): Offence {
-  return Offence(prisonApiCharge.offenceCode, prisonApiCharge.offenceStatue)
+  return Offence(prisonApiCharge.offenceCode, prisonApiCharge.offenceStatue, prisonApiCharge.offenceDescription)
 }
 
 private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): CourtDate {
@@ -57,6 +58,7 @@ private fun transformToType(courtDateResult: PrisonApiCourtDateResult): CourtDat
     "1116" -> CourtDateType.STOP
     "4530" -> CourtDateType.STOP
     "1002" -> CourtDateType.STOP
+    "4015" -> CourtDateType.STOP
     "4572" -> CourtDateType.CONTINUE
     "4506" -> CourtDateType.CONTINUE
     "1510" -> CourtDateType.CONTINUE

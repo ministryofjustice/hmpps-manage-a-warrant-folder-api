@@ -2,5 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 data class Offence(
   val code: String,
-  val statute: String
+  val statute: String,
+  val description: String
 )

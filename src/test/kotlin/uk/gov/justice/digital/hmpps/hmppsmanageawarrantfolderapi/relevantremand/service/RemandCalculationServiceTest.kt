@@ -11,6 +11,8 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandPeriod
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
 import java.time.LocalDate
 
 class RemandCalculationServiceTest {
@@ -23,22 +25,7 @@ class RemandCalculationServiceTest {
       assertThrows<UnsupportedCalculationException> { remandCalculationService.calculate(RemandCalculation(emptyList())) }
     }
     @Test
-    fun `Error if there is more than one unrelated charge`() {
-      assertThrows<UnsupportedCalculationException> {
-        remandCalculationService.calculate(
-          RemandCalculation(
-            listOf(
-              Charge(1, offence, offenceDate, offenceEndDate, 1, emptyList()),
-              Charge(2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, 2, emptyList()),
-            )
-          )
-        )
-      }
-    }
-
-    @Test
     fun `No remand calculated if there are no start events`() {
-
       val result = remandCalculationService.calculate(
         RemandCalculation(
           aCharge(
@@ -50,7 +37,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEmpty()
+      assertThat(result.finalRemand).isEmpty()
     }
 
     @Test
@@ -65,7 +52,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2022, 1, 1),
@@ -74,7 +61,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(31)
+      assertThat(result.finalRemand[0].days).isEqualTo(31)
     }
 
     @Test
@@ -89,7 +76,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2022, 1, 1),
@@ -98,7 +85,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(31)
+      assertThat(result.finalRemand[0].days).isEqualTo(31)
     }
     @Test
     fun `Remand preprod example `() {
@@ -112,7 +99,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2021, 5, 13),
@@ -121,7 +108,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(1)
+      assertThat(result.finalRemand[0].days).isEqualTo(1)
     }
     @Test
     fun `Remand with bail (not final stop)`() {
@@ -137,7 +124,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2015, 3, 25),
@@ -146,7 +133,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(15)
+      assertThat(result.finalRemand[0].days).isEqualTo(15)
     }
     @Test
     fun `Remand with related offences`() {
@@ -154,13 +141,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, offenceEndDate, 1,
+              1, offence, offenceDate, offenceEndDate, 1, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             Charge(
-              2, offence, offenceDate, offenceEndDate, null,
+              2, offence, offenceDate, offenceEndDate, null, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -168,7 +155,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2020, 1, 5),
@@ -177,7 +164,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(15)
+      assertThat(result.finalRemand[0].days).isEqualTo(15)
     }
     @Test
     fun `Remand with related offences no end date`() {
@@ -185,13 +172,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, null, 1,
+              1, offence, offenceDate, null, 1, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             Charge(
-              2, offence, offenceDate, null, null,
+              2, offence, offenceDate, null, null, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -199,7 +186,7 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result).isEqualTo(
+      assertThat(result.finalRemand).isEqualTo(
         listOf(
           Remand(
             LocalDate.of(2020, 1, 5),
@@ -208,16 +195,98 @@ class RemandCalculationServiceTest {
           )
         )
       )
-      assertThat(result[0].days).isEqualTo(15)
+      assertThat(result.finalRemand[0].days).isEqualTo(15)
+    }
+
+    @Test
+    fun `Remand with multiple offences`() {
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          listOf(
+            Charge(
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null,
+              listOf(
+                CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
+                CourtDate(date = LocalDate.of(2021, 6, 14), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 6, 15), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            Charge(
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, 2, null,
+              listOf(
+                CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
+                CourtDate(date = LocalDate.of(2021, 6, 14), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 6, 15), type = CourtDateType.STOP, final = true)
+              )
+            ),
+          )
+        )
+      )
+      assertThat(result).isEqualTo(
+        RemandResult(
+          listOf(
+            RemandPeriod(
+              LocalDate.of(2019, 7, 6),
+              LocalDate.of(2020, 9, 24),
+              offenceDate,
+              offenceEndDate,
+              offence.code,
+              offence.description, null,
+              1
+            ),
+            RemandPeriod(
+              LocalDate.of(2021, 6, 14),
+              LocalDate.of(2021, 6, 14),
+              offenceDate,
+              offenceEndDate,
+              offence.code,
+              offence.description, null,
+              1
+            ),
+            RemandPeriod(
+              LocalDate.of(2019, 7, 6),
+              LocalDate.of(2020, 9, 24),
+              unrelatedOffenceDate,
+              unrelatedOffenceEndDate,
+              unrelatedOffence.code,
+              unrelatedOffence.description, null,
+              2
+            ),
+            RemandPeriod(
+              LocalDate.of(2021, 6, 14),
+              LocalDate.of(2021, 6, 14),
+              unrelatedOffenceDate,
+              unrelatedOffenceEndDate,
+              unrelatedOffence.code,
+              unrelatedOffence.description, null,
+              2
+            )
+          ),
+          listOf(
+            Remand(
+              LocalDate.of(2019, 7, 6),
+              LocalDate.of(2020, 9, 24),
+              SENTENCE_SEQUENCE
+            ),
+            Remand(
+              LocalDate.of(2021, 6, 14),
+              LocalDate.of(2021, 6, 14),
+              SENTENCE_SEQUENCE
+            )
+          )
+        )
+      )
     }
   }
 
   fun aCharge(courtDates: List<CourtDate>): List<Charge> {
-    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, courtDates))
+    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null, courtDates))
   }
   companion object {
-    val offence = Offence("1", "1")
-    val unrelatedOffence = Offence("2", "2")
+    val offence = Offence("1", "1", "An offence")
+    val unrelatedOffence = Offence("2", "2", "An unrelated offence")
     val offenceDate = LocalDate.of(2000, 1, 1)
     val offenceEndDate = LocalDate.of(2000, 1, 1)
     val unrelatedOffenceDate = LocalDate.of(2001, 1, 1)
