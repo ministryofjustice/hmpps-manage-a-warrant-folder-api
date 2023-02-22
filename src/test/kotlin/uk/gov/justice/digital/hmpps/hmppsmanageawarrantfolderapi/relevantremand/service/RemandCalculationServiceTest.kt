@@ -273,7 +273,7 @@ class RemandCalculationServiceTest {
             Remand(
               LocalDate.of(2021, 6, 14),
               LocalDate.of(2021, 6, 14),
-              SECOND_SENTENCE_SEQUENCE
+              SENTENCE_SEQUENCE
             )
           )
         )
