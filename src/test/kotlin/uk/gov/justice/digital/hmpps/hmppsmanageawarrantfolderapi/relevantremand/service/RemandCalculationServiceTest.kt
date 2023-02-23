@@ -213,7 +213,7 @@ class RemandCalculationServiceTest {
               )
             ),
             Charge(
-              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, 2, null,
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, null,
               listOf(
                 CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
@@ -279,6 +279,68 @@ class RemandCalculationServiceTest {
         )
       )
     }
+
+    @Test
+    fun `Remand with overlapping periods`() {
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          listOf(
+            Charge(
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2020, 3, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            Charge(
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, null,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 2, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+          )
+        )
+      )
+      assertThat(result).isEqualTo(
+        RemandResult(
+          listOf(
+            RemandPeriod(
+              LocalDate.of(2020, 1, 1),
+              LocalDate.of(2020, 2, 29),
+              offenceDate,
+              offenceEndDate,
+              offence.code,
+              offence.description, null,
+              1
+            ),
+            RemandPeriod(
+              LocalDate.of(2020, 2, 1),
+              LocalDate.of(2020, 3, 31),
+              unrelatedOffenceDate,
+              unrelatedOffenceEndDate,
+              unrelatedOffence.code,
+              unrelatedOffence.description, null,
+              2
+            ),
+          ),
+          listOf(
+            Remand(
+              LocalDate.of(2020, 1, 1),
+              LocalDate.of(2020, 1, 31),
+              SENTENCE_SEQUENCE
+            ),
+            Remand(
+              LocalDate.of(2020, 2, 1),
+              LocalDate.of(2020, 3, 31),
+              SECOND_SENTENCE_SEQUENCE
+            )
+          )
+        )
+      )
+
+      assertThat(result.finalRemand.sumOf { it.days }).isEqualTo(91)
+    }
   }
 
   fun aCharge(courtDates: List<CourtDate>): List<Charge> {
@@ -292,5 +354,6 @@ class RemandCalculationServiceTest {
     val unrelatedOffenceDate = LocalDate.of(2001, 1, 1)
     val unrelatedOffenceEndDate = LocalDate.of(2001, 1, 1)
     const val SENTENCE_SEQUENCE = 1
+    const val SECOND_SENTENCE_SEQUENCE = 2
   }
 }

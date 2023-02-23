@@ -51,18 +51,21 @@ class RemandCalculationService {
       val charge = it.first
       val period = it.second
       if (charge.sentenceSequence != null && !remandAlreadyCovered(remands, period)) {
+        val start = listOfNotNull(period.from, startOfLastRemand(remands)).max()
         val nextPeriod = nextPeriodOrNull(index, sortedRemand)
         val end = if (nextRemandOverlaps(period, nextPeriod)) {
-          nextPeriod!!.from
+          nextPeriod!!.from.minusDays(1)
         } else {
           period.to
         }
-        remands.add(Remand(period.from, end, charge.sentenceSequence))
+        remands.add(Remand(start, end, charge.sentenceSequence))
       }
     }
     return remands
   }
-  private fun remandAlreadyCovered(remands: List<Remand>, it: RemandPeriod): Boolean = remands.isNotEmpty() && remands.last().to >= it.from
+  private fun startOfLastRemand(remands: List<Remand>): LocalDate? = remands.lastOrNull()?.from
+
+  private fun remandAlreadyCovered(remands: List<Remand>, it: RemandPeriod): Boolean = remands.isNotEmpty() && remands.last().to >= it.to
 
   private fun nextRemandOverlaps(it: RemandPeriod, nextPeriod: RemandPeriod?): Boolean = nextPeriod != null && nextPeriod.from != it.from && nextPeriod.from < it.to
 
