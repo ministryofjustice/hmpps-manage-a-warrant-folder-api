@@ -109,8 +109,8 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
           RemandPeriod(from = LocalDate.of(2021, 6, 14), to = LocalDate.of(2021, 6, 14), offenceDate = LocalDate.of(2019, 5, 1), offenceEndDate = LocalDate.of(2019, 5, 21), offenceCode = "MD71145C", offenceDescription = "An other offence", chargeId = 4)
         ),
         finalRemand = listOf(
-          Remand(from = LocalDate.of(2019, 7, 6), to = LocalDate.of(2020, 9, 24), sentence = 1, bookingId = 1),
-          Remand(from = LocalDate.of(2021, 6, 14), to = LocalDate.of(2021, 6, 14), sentence = 1, bookingId = 1)
+          Remand(from = LocalDate.of(2019, 7, 6), to = LocalDate.of(2020, 9, 24), sentence = 1, bookingId = 2),
+          Remand(from = LocalDate.of(2021, 6, 14), to = LocalDate.of(2021, 6, 14), sentence = 1, bookingId = 2)
         )
       )
     )

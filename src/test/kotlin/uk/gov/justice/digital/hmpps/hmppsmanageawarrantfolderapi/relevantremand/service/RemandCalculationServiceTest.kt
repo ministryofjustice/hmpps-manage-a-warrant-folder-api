@@ -151,7 +151,7 @@ class RemandCalculationServiceTest {
               )
             ),
             Charge(
-              2, offence, offenceDate, offenceEndDate, null, BOOKING_ID,null,
+              2, offence, offenceDate, offenceEndDate, null, BOOKING_ID, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -183,7 +183,7 @@ class RemandCalculationServiceTest {
               )
             ),
             Charge(
-              2, offence, offenceDate, null, null, BOOKING_ID,null,
+              2, offence, offenceDate, null, null, BOOKING_ID, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -294,14 +294,14 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID,null,
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID, null,
               listOf(
                 CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 3, 1), type = CourtDateType.STOP, final = true)
               )
             ),
             Charge(
-              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, BOOKING_ID,null,
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, BOOKING_ID, null,
               listOf(
                 CourtDate(date = LocalDate.of(2020, 2, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.STOP, final = true)
@@ -354,7 +354,7 @@ class RemandCalculationServiceTest {
   }
 
   fun aCharge(courtDates: List<CourtDate>): List<Charge> {
-    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID,null, courtDates))
+    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID, null, courtDates))
   }
   companion object {
     val offence = Offence("1", "1", "An offence")
