@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit
 data class Remand(
   val from: LocalDate,
   val to: LocalDate,
+  val bookingId: Long,
   val sentence: Int
 ) {
   val days: Long get() {

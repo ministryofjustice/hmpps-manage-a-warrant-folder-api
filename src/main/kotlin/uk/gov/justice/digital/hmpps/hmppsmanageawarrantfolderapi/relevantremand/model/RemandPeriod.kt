@@ -11,7 +11,7 @@ data class RemandPeriod(
   val offenceCode: String,
   val offenceDescription: String,
   val courtCaseRef: String? = null,
-  val chargeId: Long
+  val chargeId: Long,
 ) {
   val days: Long get() {
     return ChronoUnit.DAYS.between(from, to) + 1

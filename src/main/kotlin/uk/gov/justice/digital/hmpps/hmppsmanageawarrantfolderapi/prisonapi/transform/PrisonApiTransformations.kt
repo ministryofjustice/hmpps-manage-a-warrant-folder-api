@@ -23,6 +23,7 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
           charge.offenceDate,
           charge.offenceEndDate,
           charge.sentenceSequence,
+          it.value.first().bookingId,
           charge.courtCaseRef,
           it.value.map { result -> transformToCourtDate(result) }
         )
