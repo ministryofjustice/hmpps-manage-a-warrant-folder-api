@@ -57,6 +57,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2022, 1, 1),
             LocalDate.of(2022, 1, 31),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -81,6 +82,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2022, 1, 1),
             LocalDate.of(2022, 1, 31),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -104,6 +106,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2021, 5, 13),
             LocalDate.of(2021, 5, 13),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -129,6 +132,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2015, 3, 25),
             LocalDate.of(2015, 4, 8),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -141,13 +145,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, offenceEndDate, 1, null,
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             Charge(
-              2, offence, offenceDate, offenceEndDate, null, null,
+              2, offence, offenceDate, offenceEndDate, null, BOOKING_ID,null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -160,6 +164,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2020, 1, 5),
             LocalDate.of(2020, 1, 19),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -172,13 +177,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, null, 1, null,
+              1, offence, offenceDate, null, 1, BOOKING_ID, null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             Charge(
-              2, offence, offenceDate, null, null, null,
+              2, offence, offenceDate, null, null, BOOKING_ID,null,
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -191,6 +196,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2020, 1, 5),
             LocalDate.of(2020, 1, 19),
+            BOOKING_ID,
             SENTENCE_SEQUENCE
           )
         )
@@ -204,7 +210,7 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null,
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID, null,
               listOf(
                 CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
@@ -213,7 +219,7 @@ class RemandCalculationServiceTest {
               )
             ),
             Charge(
-              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, null,
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, BOOKING_ID, null,
               listOf(
                 CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
@@ -268,11 +274,13 @@ class RemandCalculationServiceTest {
             Remand(
               LocalDate.of(2019, 7, 6),
               LocalDate.of(2020, 9, 24),
+              BOOKING_ID,
               SENTENCE_SEQUENCE
             ),
             Remand(
               LocalDate.of(2021, 6, 14),
               LocalDate.of(2021, 6, 14),
+              BOOKING_ID,
               SENTENCE_SEQUENCE
             )
           )
@@ -286,14 +294,14 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             Charge(
-              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null,
+              1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID,null,
               listOf(
                 CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 3, 1), type = CourtDateType.STOP, final = true)
               )
             ),
             Charge(
-              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, null,
+              2, unrelatedOffence, unrelatedOffenceDate, unrelatedOffenceEndDate, SECOND_SENTENCE_SEQUENCE, BOOKING_ID,null,
               listOf(
                 CourtDate(date = LocalDate.of(2020, 2, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.STOP, final = true)
@@ -328,11 +336,13 @@ class RemandCalculationServiceTest {
             Remand(
               LocalDate.of(2020, 1, 1),
               LocalDate.of(2020, 1, 31),
+              BOOKING_ID,
               SENTENCE_SEQUENCE
             ),
             Remand(
               LocalDate.of(2020, 2, 1),
               LocalDate.of(2020, 3, 31),
+              BOOKING_ID,
               SECOND_SENTENCE_SEQUENCE
             )
           )
@@ -344,7 +354,7 @@ class RemandCalculationServiceTest {
   }
 
   fun aCharge(courtDates: List<CourtDate>): List<Charge> {
-    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, null, courtDates))
+    return listOf(Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID,null, courtDates))
   }
   companion object {
     val offence = Offence("1", "1", "An offence")
@@ -355,5 +365,6 @@ class RemandCalculationServiceTest {
     val unrelatedOffenceEndDate = LocalDate.of(2001, 1, 1)
     const val SENTENCE_SEQUENCE = 1
     const val SECOND_SENTENCE_SEQUENCE = 2
+    const val BOOKING_ID = 1L
   }
 }

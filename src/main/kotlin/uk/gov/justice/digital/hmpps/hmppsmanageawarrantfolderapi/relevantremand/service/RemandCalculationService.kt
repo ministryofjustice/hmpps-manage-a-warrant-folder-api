@@ -58,7 +58,7 @@ class RemandCalculationService {
         } else {
           period.to
         }
-        remands.add(Remand(start, end, charge.sentenceSequence))
+        remands.add(Remand(start, end, charge.bookingId, charge.sentenceSequence))
       }
     }
     return remands
