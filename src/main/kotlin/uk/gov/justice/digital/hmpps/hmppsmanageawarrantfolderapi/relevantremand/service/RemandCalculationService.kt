@@ -46,19 +46,19 @@ class RemandCalculationService {
 
   private fun extractFinalRemand(remandPeriods: List<Pair<Charge, RemandPeriod>>): List<Remand> {
     val remands = mutableListOf<Remand>()
-    val sortedRemand = remandPeriods.sortedBy { it.second.from }
-    sortedRemand.forEachIndexed { index, it ->
+    val sortedPeriods = remandPeriods.filter { it.first.sentenceSequence != null }.sortedBy { it.second.from }
+    sortedPeriods.forEachIndexed { index, it ->
       val charge = it.first
       val period = it.second
-      if (charge.sentenceSequence != null && !remandAlreadyCovered(remands, period)) {
+      if (!remandAlreadyCovered(remands, period)) {
         val start = listOfNotNull(period.from, startOfLastRemand(remands)).max()
-        val nextPeriod = nextPeriodOrNull(index, sortedRemand)
+        val nextPeriod = nextPeriodOrNull(index, sortedPeriods)
         val end = if (nextRemandOverlaps(period, nextPeriod)) {
           nextPeriod!!.from.minusDays(1)
         } else {
           period.to
         }
-        remands.add(Remand(start, end, charge.bookingId, charge.sentenceSequence))
+        remands.add(Remand(start, end, charge.bookingId, charge.sentenceSequence!!))
       }
     }
     return remands
