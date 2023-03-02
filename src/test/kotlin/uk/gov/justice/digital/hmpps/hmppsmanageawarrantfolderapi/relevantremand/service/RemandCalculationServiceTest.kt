@@ -351,6 +351,36 @@ class RemandCalculationServiceTest {
 
       assertThat(result.finalRemand.sumOf { it.days }).isEqualTo(91)
     }
+
+    @Test
+    fun `Remand with overlapping periods where some have no sentence sequence`() {
+      val result = remandCalculationService.calculate(
+        RemandCalculation(charges=listOf(
+          Charge(chargeId=1, offence=offence, offenceDate=LocalDate.of(2022, 11,2), offenceEndDate=null, sentenceSequence=null, bookingId=1, courtCaseRef="ABC", courtDates=listOf(CourtDate(date=LocalDate.of(2022, 11,4), type=CourtDateType.START), CourtDate(date=LocalDate.of(2022, 11, 7), type=CourtDateType.START), CourtDate(date=LocalDate.of(2022,11,9), type=CourtDateType.STOP))),
+          Charge(chargeId=2, offence=offence, offenceDate=LocalDate.of(2022, 11, 9), offenceEndDate=null, sentenceSequence= SENTENCE_SEQUENCE, bookingId=2, courtCaseRef="ABC", courtDates=listOf(CourtDate(date=LocalDate.of(2022,11,11), type=CourtDateType.START), CourtDate(date=LocalDate.of(2022,11,18), type=CourtDateType.START), CourtDate(date=LocalDate.of(2022,12,16), type=CourtDateType.START), CourtDate(date=LocalDate.of(2023,1,4), type=CourtDateType.STOP, final=true))),
+          Charge(chargeId=3, offence=offence, offenceDate=LocalDate.of(2022, 10, 26), offenceEndDate=null, sentenceSequence=null, bookingId=2, courtCaseRef="ABC", courtDates=listOf(CourtDate(date=LocalDate.of(2022,12,16), type=CourtDateType.START), CourtDate(date=LocalDate.of(2023,1,4), type=CourtDateType.STOP, final=true))),
+          Charge(chargeId=4, offence=offence, offenceDate=LocalDate.of(2022, 11,2), offenceEndDate=null, sentenceSequence= SECOND_SENTENCE_SEQUENCE, bookingId=2, courtCaseRef="ABC", courtDates=listOf(CourtDate(date=LocalDate.of(2023,1,4), type=CourtDateType.STOP, final=true)))
+        ))
+      )
+      assertThat(result.finalRemand).isEqualTo(
+        listOf(
+          Remand(
+            LocalDate.of(2022, 11, 4),
+            LocalDate.of(2022, 11, 9),
+            2,
+            SECOND_SENTENCE_SEQUENCE
+          ),
+          Remand(
+            LocalDate.of(2022, 11, 11),
+            LocalDate.of(2023, 1, 3),
+            2,
+            SENTENCE_SEQUENCE
+          )
+        )
+      )
+      
+      assertThat(result.finalRemand.sumOf { it.days }).isEqualTo(60)
+    }
   }
 
   fun aCharge(courtDates: List<CourtDate>): List<Charge> {
