@@ -2,16 +2,21 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.tran
 
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonApiCharge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonApiCourtDateResult
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonerDetails
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
+import java.time.LocalDate
 
-fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
+fun transform(results: List<PrisonApiCourtDateResult>, prisonerDetails: PrisonerDetails): RemandCalculation {
+  val earliestActiveOffenceDate: LocalDate = findEarliestActiveOffenceDate(results, prisonerDetails)
   return RemandCalculation(
-    results.groupBy { it.charge.chargeId }
+    results
+      .filter { it.date.isAfter(earliestActiveOffenceDate) }
+      .groupBy { it.charge.chargeId }
       .map {
         val charge = it.value.first().charge
         if (charge.offenceDate == null) {
@@ -31,13 +36,20 @@ fun transform(results: List<PrisonApiCourtDateResult>): RemandCalculation {
   )
 }
 
+private fun findEarliestActiveOffenceDate(results: List<PrisonApiCourtDateResult>, prisonerDetails: PrisonerDetails): LocalDate {
+  return results
+    .filter { it.bookingId == prisonerDetails.bookingId }
+    .mapNotNull { it.charge.offenceDate }
+    .min()
+}
+
 private fun transform(prisonApiCharge: PrisonApiCharge): Offence {
   return Offence(prisonApiCharge.offenceCode, prisonApiCharge.offenceStatue, prisonApiCharge.offenceDescription)
 }
 
 private fun transformToCourtDate(courtDateResult: PrisonApiCourtDateResult): CourtDate {
   return CourtDate(
-    courtDateResult.date!!,
+    courtDateResult.date,
     transformToType(courtDateResult),
     courtDateResult.resultDispositionCode == "F"
   )

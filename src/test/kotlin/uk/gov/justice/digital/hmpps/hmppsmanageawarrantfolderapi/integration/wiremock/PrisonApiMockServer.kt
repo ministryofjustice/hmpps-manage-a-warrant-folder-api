@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.wi
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
@@ -43,7 +42,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
     private const val WIREMOCK_PORT = 8332
   }
 
-  fun stubImprisonedCourtCaseResults(): StubMapping =
+  fun stubImprisonedCourtCaseResults() {
     stubFor(
       get("/api/digital-warrant/court-date-results/${PrisonApiExtension.IMPRISONED_PRISONER}")
         .willReturn(
@@ -105,6 +104,24 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "sentenceSequence":1
                     },
                     "bookingId":1
+                 },
+                 {
+                    "id":4,
+                    "date":"2015-12-13",
+                    "resultCode":null,
+                    "resultDescription":null,
+                    "resultDispositionCode": null,
+                    "charge":{
+                       "chargeId":1,
+                       "offenceCode":"SX03163A",
+                       "offenceStatue":"SX03",
+                       "offenceDate":null,
+                       "offenceDescription": "An offence",
+                       "guilty":false,
+                       "courtCaseId":1,
+                       "sentenceSequence":1
+                    },
+                    "bookingId":1
                  }
               ]
               """.trimIndent()
@@ -112,7 +129,24 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
             .withStatus(200)
         )
     )
-  fun stubBailPrisoner(): StubMapping =
+    stubFor(
+      get("/api/offenders/${PrisonApiExtension.IMPRISONED_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {
+                  "bookingId": 1,
+                  "offenderNo": "${PrisonApiExtension.IMPRISONED_PRISONER}"
+                }
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
+  fun stubBailPrisoner() {
     stubFor(
       get("/api/digital-warrant/court-date-results/${PrisonApiExtension.BAIL_PRISONER}")
         .willReturn(
@@ -131,7 +165,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":1,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -149,7 +183,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":1,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -167,7 +201,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":1,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -181,7 +215,25 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
             .withStatus(200)
         )
     )
-  fun stubRelatedOffencesPrisoner(): StubMapping =
+
+    stubFor(
+      get("/api/offenders/${PrisonApiExtension.BAIL_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {
+                  "bookingId": 1,
+                  "offenderNo": "${PrisonApiExtension.BAIL_PRISONER}"
+                }
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
+  fun stubRelatedOffencesPrisoner() {
     stubFor(
       get("/api/digital-warrant/court-date-results/${PrisonApiExtension.RELATED_PRISONER}")
         .willReturn(
@@ -200,7 +252,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":1,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -218,7 +270,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":2,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -236,7 +288,7 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "chargeId":3,
                        "offenceCode":"SX03163A",
                        "offenceStatue":"SX03",
-                       "offenceDate":"2021-05-05",
+                       "offenceDate":"2010-05-05",
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
@@ -251,7 +303,25 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
         )
     )
 
-  fun stubMultipleOffences(): StubMapping =
+    stubFor(
+      get("/api/offenders/${PrisonApiExtension.RELATED_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {
+                  "bookingId": 1,
+                  "offenderNo": "${PrisonApiExtension.BAIL_PRISONER}"
+                }
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
+
+  fun stubMultipleOffences() {
     stubFor(
       get("/api/digital-warrant/court-date-results/${PrisonApiExtension.MULTIPLE_OFFENCES_PRISONER}")
         .willReturn(
@@ -814,4 +884,22 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
             .withStatus(200)
         )
     )
+
+    stubFor(
+      get("/api/offenders/${PrisonApiExtension.MULTIPLE_OFFENCES_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {
+                  "bookingId": 2,
+                  "offenderNo": "${PrisonApiExtension.MULTIPLE_OFFENCES_PRISONER}"
+                }
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
 }
