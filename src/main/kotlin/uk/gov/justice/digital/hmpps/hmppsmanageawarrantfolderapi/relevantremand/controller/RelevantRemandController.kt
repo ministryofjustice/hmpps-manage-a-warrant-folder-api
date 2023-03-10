@@ -48,7 +48,8 @@ class RelevantRemandController(
   ): RemandResult {
     log.info("Request received to calculate relevant remand for $prisonerId")
     val courtDateResults = prisonService.getCourtDateResults(prisonerId)
-    return remandCalculationService.calculate(transform(courtDateResults))
+    val prisonerDetails = prisonService.getOffenderDetail(prisonerId)
+    return remandCalculationService.calculate(transform(courtDateResults, prisonerDetails))
   }
 
   companion object {

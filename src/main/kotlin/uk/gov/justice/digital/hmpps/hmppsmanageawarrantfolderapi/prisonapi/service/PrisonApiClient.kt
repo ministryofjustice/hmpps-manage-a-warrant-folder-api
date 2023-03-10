@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonApiCourtDateResult
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonerDetails
 
 @Service
 class PrisonApiClient(@Qualifier("prisonApiWebClient") private val webClient: WebClient) {
@@ -18,6 +19,15 @@ class PrisonApiClient(@Qualifier("prisonApiWebClient") private val webClient: We
       .uri("/api/digital-warrant/court-date-results/$prisonerId")
       .retrieve()
       .bodyToMono(typeReference<List<PrisonApiCourtDateResult>>())
+      .block()!!
+  }
+
+  fun getOffenderDetail(prisonerId: String): PrisonerDetails {
+    log.info("Requesting details for prisoner $prisonerId")
+    return webClient.get()
+      .uri("/api/offenders/$prisonerId")
+      .retrieve()
+      .bodyToMono(typeReference<PrisonerDetails>())
       .block()!!
   }
 }

@@ -6,7 +6,7 @@ import java.time.LocalDate
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PrisonApiCourtDateResult(
   val id: Long,
-  val date: LocalDate?,
+  val date: LocalDate,
   val resultCode: String?,
   val resultDescription: String?,
   val resultDispositionCode: String?,
