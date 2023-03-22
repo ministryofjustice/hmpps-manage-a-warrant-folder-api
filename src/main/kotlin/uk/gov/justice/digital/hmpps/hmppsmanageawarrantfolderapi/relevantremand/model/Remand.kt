@@ -6,8 +6,7 @@ import java.time.temporal.ChronoUnit
 data class Remand(
   val from: LocalDate,
   val to: LocalDate,
-  val bookingId: Long,
-  val sentence: Int
+  val charge: Charge
 ) {
   val days: Long get() {
     return ChronoUnit.DAYS.between(from, to) + 1

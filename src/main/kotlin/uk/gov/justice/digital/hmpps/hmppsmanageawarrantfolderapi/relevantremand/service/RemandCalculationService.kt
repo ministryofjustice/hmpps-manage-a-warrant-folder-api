@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.ChargeAndEvents
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RelatedCharge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandPeriod
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
 import java.time.LocalDate
 
@@ -20,22 +20,22 @@ class RemandCalculationService {
       throw UnsupportedCalculationException("There are no charges to calculate")
     }
     val charges = combineRelatedCharges(remandCalculation)
-    val remandPeriods = remandClock(charges)
-    val remand = extractFinalRemand(remandPeriods)
-    return RemandResult(remandPeriods.map { it.second }, remand)
+    val chargeRemand = remandClock(charges)
+    val sentenceRemand = extractSentenceRemand(chargeRemand)
+    return RemandResult(chargeRemand, sentenceRemand)
   }
 
-  private fun remandClock(charges: List<Charge>): List<Pair<Charge, RemandPeriod>> {
-    val remand = mutableListOf<Pair<Charge, RemandPeriod>>()
-    charges.forEach { charge ->
-      if (hasAnyRemandEvent(charge.courtDates)) {
+  private fun remandClock(remandCalculation: RemandCalculation): List<Remand> {
+    val remand = mutableListOf<Remand>()
+    remandCalculation.charges.forEach { chargeAndEvent ->
+      if (hasAnyRemandEvent(chargeAndEvent.dates)) {
         var from: LocalDate? = null
-        charge.courtDates.forEach {
+        chargeAndEvent.dates.forEach {
           if (it.type == CourtDateType.START && from == null) {
             from = it.date
           }
           if (it.type == CourtDateType.STOP && from != null) {
-            remand.add(charge to RemandPeriod(from!!, getToDate(it), charge.offenceDate, charge.offenceEndDate, charge.offence.code, charge.offence.description, charge.courtCaseRef, charge.chargeId))
+            remand.add(Remand(from!!, getToDate(it), chargeAndEvent.charge))
             from = null
           }
         }
@@ -44,48 +44,47 @@ class RemandCalculationService {
     return remand
   }
 
-  private fun extractFinalRemand(remandPeriods: List<Pair<Charge, RemandPeriod>>): List<Remand> {
+  private fun extractSentenceRemand(remandPeriods: List<Remand>): List<Remand> {
     val remands = mutableListOf<Remand>()
-    val sortedPeriods = remandPeriods.filter { it.first.sentenceSequence != null }.sortedBy { it.second.from }
+    val sortedPeriods = remandPeriods.filter { it.charge.sentenceSequence != null }.sortedBy { it.from }
     sortedPeriods.forEachIndexed { index, it ->
-      val charge = it.first
-      val period = it.second
-      if (!remandAlreadyCovered(remands, period)) {
-        val start = listOfNotNull(period.from, startOfLastRemand(remands)).max()
+      val charge = it.charge
+      if (!remandAlreadyCovered(remands, it)) {
+        val start = listOfNotNull(it.from, startOfLastRemand(remands)).max()
         val nextPeriod = nextPeriodOrNull(index, sortedPeriods)
-        val end = if (nextRemandOverlaps(period, nextPeriod)) {
+        val end = if (nextRemandOverlaps(it, nextPeriod)) {
           nextPeriod!!.from.minusDays(1)
         } else {
-          period.to
+          it.to
         }
-        remands.add(Remand(start, end, charge.bookingId, charge.sentenceSequence!!))
+        remands.add(Remand(start, end, charge))
       }
     }
     return remands
   }
   private fun startOfLastRemand(remands: List<Remand>): LocalDate? = remands.lastOrNull()?.from
 
-  private fun remandAlreadyCovered(remands: List<Remand>, it: RemandPeriod): Boolean = remands.isNotEmpty() && remands.last().to >= it.to
+  private fun remandAlreadyCovered(remands: List<Remand>, it: Remand): Boolean = remands.isNotEmpty() && remands.last().to >= it.to
 
-  private fun nextRemandOverlaps(it: RemandPeriod, nextPeriod: RemandPeriod?): Boolean = nextPeriod != null && nextPeriod.from != it.from && nextPeriod.from < it.to
+  private fun nextRemandOverlaps(it: Remand, nextPeriod: Remand?): Boolean = nextPeriod != null && nextPeriod.from != it.from && nextPeriod.from < it.to
 
-  private fun nextPeriodOrNull(index: Int, sortedRemand: List<Pair<Charge, RemandPeriod>>): RemandPeriod? = if (index == sortedRemand.size - 1) null else sortedRemand[index + 1].second
+  private fun nextPeriodOrNull(index: Int, sortedRemand: List<Remand>): Remand? = if (index == sortedRemand.size - 1) null else sortedRemand[index + 1]
 
-  private fun combineRelatedCharges(remandCalculation: RemandCalculation): List<Charge> {
-    val mapOfRelatedCharges = remandCalculation.charges.groupBy { RelatedCharge(it.offenceDate, it.offenceEndDate, it.offence.code) }
-    return mapOfRelatedCharges.map {
-      pickMostAppropriateCharge(it.value).copy(
-        courtDates = flattenCourtDates(it.value)
-      )
-    }
+  private fun combineRelatedCharges(remandCalculation: RemandCalculation): RemandCalculation {
+    val mapOfRelatedCharges = remandCalculation.charges.groupBy { RelatedCharge(it.charge.offenceDate, it.charge.offenceEndDate, it.charge.offence.code) }
+    return RemandCalculation(
+      mapOfRelatedCharges.map {
+        ChargeAndEvents(pickMostAppropriateCharge(it.value), flattenCourtDates(it.value))
+      }
+    )
   }
 
-  private fun pickMostAppropriateCharge(relatedCharges: List<Charge>): Charge {
+  private fun pickMostAppropriateCharge(relatedCharges: List<ChargeAndEvents>): Charge {
     // Pick the charge with a sentence attached, otherwise just the first charge. This logic may change.
-    return relatedCharges.find { it.sentenceSequence != null } ?: relatedCharges.first()
+    return relatedCharges.find { it.charge.sentenceSequence != null }?.charge ?: relatedCharges.first().charge
   }
 
-  private fun flattenCourtDates(relatedCharges: List<Charge>) = relatedCharges.flatMap { it.courtDates }.sortedBy { it.date }
+  private fun flattenCourtDates(relatedCharges: List<ChargeAndEvents>) = relatedCharges.flatMap { it.dates }.sortedBy { it.date }
 
   private fun hasAnyRemandEvent(courtDates: List<CourtDate>) = courtDates.any { it.type == CourtDateType.START }
 
