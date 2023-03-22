@@ -6,11 +6,13 @@ data class PrisonApiCharge(
   val chargeId: Long,
   val offenceCode: String,
   val offenceStatue: String,
-  val offenceDate: LocalDate?,
-  val offenceEndDate: LocalDate?,
+  val offenceDate: LocalDate? = null,
+  val offenceEndDate: LocalDate? = null,
   val offenceDescription: String,
   val guilty: Boolean,
   val courtCaseId: Long,
-  val courtCaseRef: String?,
-  val sentenceSequence: Int?
+  val courtCaseRef: String? = null,
+  val courtLocation: String? = null,
+  val sentenceSequence: Int? = null,
+  val resultDescription: String? = null,
 )

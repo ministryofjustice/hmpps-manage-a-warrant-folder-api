@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.prisonapi.model.PrisonerDetails
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.ChargeAndEvents
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Offence
@@ -22,14 +23,18 @@ fun transform(results: List<PrisonApiCourtDateResult>, prisonerDetails: Prisoner
         if (charge.offenceDate == null) {
           throw UnsupportedCalculationException("The charge ${charge.chargeId} has no offence date.")
         }
-        Charge(
-          it.key,
-          transform(charge),
-          charge.offenceDate,
-          charge.offenceEndDate,
-          charge.sentenceSequence,
-          it.value.first().bookingId,
-          charge.courtCaseRef,
+        ChargeAndEvents(
+          Charge(
+            it.key,
+            transform(charge),
+            charge.offenceDate,
+            charge.offenceEndDate,
+            charge.sentenceSequence,
+            it.value.first().bookingId,
+            charge.courtCaseRef,
+            charge.courtLocation,
+            charge.resultDescription
+          ),
           it.value.map { result -> transformToCourtDate(result) }
         )
       }
