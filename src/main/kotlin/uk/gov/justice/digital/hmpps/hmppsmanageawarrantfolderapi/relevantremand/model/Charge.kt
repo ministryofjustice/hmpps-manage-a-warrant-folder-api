@@ -9,5 +9,7 @@ data class Charge(
   val offenceEndDate: LocalDate?,
   val sentenceSequence: Int?,
   val bookingId: Long,
-  val courtCaseRef: String?
+  val courtCaseRef: String?,
+  val courtLocation: String? = null,
+  val resultDescription: String? = null,
 )

@@ -32,6 +32,8 @@ fun transform(results: List<PrisonApiCourtDateResult>, prisonerDetails: Prisoner
             charge.sentenceSequence,
             it.value.first().bookingId,
             charge.courtCaseRef,
+            charge.courtLocation,
+            charge.resultDescription
           ),
           it.value.map { result -> transformToCourtDate(result) }
         )
