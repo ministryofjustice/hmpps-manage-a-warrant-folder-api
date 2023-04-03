@@ -4,6 +4,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.ChargeAndEvents
@@ -16,7 +22,9 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import java.time.LocalDate
 
 class RemandCalculationServiceTest {
-  private val remandCalculationService = RemandCalculationService()
+  private val calculateReleaseDateService = mock<CalculateReleaseDateService>()
+  private val sentenceRemandService = SentenceRemandService(calculateReleaseDateService)
+  private val remandCalculationService = RemandCalculationService(sentenceRemandService)
 
   @Nested
   inner class Calculations {
@@ -34,7 +42,8 @@ class RemandCalculationServiceTest {
               CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.STOP),
               CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP),
               CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.CONTINUE),
-            )
+            ),
+            LocalDate.of(2022, 2, 1)
           )
         )
       )
@@ -49,8 +58,9 @@ class RemandCalculationServiceTest {
             listOf(
               CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START),
               CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP, true)
-            )
-          )
+            ),
+            LocalDate.of(2022, 2, 1)
+          ),
         )
       )
       assertThat(result.sentenceRemand).isEqualTo(
@@ -58,7 +68,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2022, 1, 1),
             LocalDate.of(2022, 1, 31),
-            aCharge()
+            aCharge().copy(sentenceDate = LocalDate.of(2022, 2, 1))
           )
         )
       )
@@ -72,8 +82,9 @@ class RemandCalculationServiceTest {
           chargeAndEvents(
             listOf(
               CourtDate(LocalDate.of(2022, 2, 1), CourtDateType.STOP, true),
-              CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START)
-            )
+              CourtDate(LocalDate.of(2022, 1, 1), CourtDateType.START),
+            ),
+            LocalDate.of(2022, 2, 1)
           )
         )
       )
@@ -82,7 +93,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2022, 1, 1),
             LocalDate.of(2022, 1, 31),
-            aCharge()
+            aCharge().copy(sentenceDate = LocalDate.of(2022, 2, 1))
           )
         )
       )
@@ -97,7 +108,8 @@ class RemandCalculationServiceTest {
             listOf(
               CourtDate(LocalDate.of(2021, 5, 13), CourtDateType.START),
               CourtDate(LocalDate.of(2021, 5, 14), CourtDateType.STOP, true)
-            )
+            ),
+            LocalDate.of(2021, 5, 14)
           )
         )
       )
@@ -106,7 +118,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2021, 5, 13),
             LocalDate.of(2021, 5, 13),
-            aCharge()
+            aCharge().copy(sentenceDate = LocalDate.of(2021, 5, 14))
           )
         )
       )
@@ -122,8 +134,8 @@ class RemandCalculationServiceTest {
               CourtDate(LocalDate.of(2015, 3, 25), CourtDateType.START),
               CourtDate(LocalDate.of(2015, 4, 8), CourtDateType.STOP),
               CourtDate(LocalDate.of(2015, 9, 18), CourtDateType.STOP, true)
-
-            )
+            ),
+            LocalDate.of(2015, 9, 18)
           )
         )
       )
@@ -132,7 +144,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2015, 3, 25),
             LocalDate.of(2015, 4, 8),
-            aCharge()
+            aCharge().copy(sentenceDate = LocalDate.of(2015, 9, 18))
           )
         )
       )
@@ -145,13 +157,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             ChargeAndEvents(
-              aCharge(),
+              aCharge().copy(sentenceDate = LocalDate.of(2020, 1, 20)),
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             ChargeAndEvents(
-              aCharge().copy(chargeId = 2),
+              aCharge().copy(chargeId = 2, sentenceDate = LocalDate.of(2020, 1, 20)),
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -164,7 +176,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2020, 1, 5),
             LocalDate.of(2020, 1, 19),
-            aCharge()
+            aCharge().copy(sentenceDate = LocalDate.of(2020, 1, 20))
           )
         )
       )
@@ -177,13 +189,13 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             ChargeAndEvents(
-              aCharge().copy(offenceEndDate = null),
+              aCharge().copy(offenceEndDate = null, sentenceDate = LocalDate.of(2020, 1, 20)),
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 5), CourtDateType.START)
               )
             ),
             ChargeAndEvents(
-              aCharge().copy(chargeId = 2, offenceEndDate = null),
+              aCharge().copy(chargeId = 2, offenceEndDate = null, sentenceDate = LocalDate.of(2020, 1, 20)),
               listOf(
                 CourtDate(LocalDate.of(2020, 1, 20), CourtDateType.STOP, final = true)
               )
@@ -196,7 +208,7 @@ class RemandCalculationServiceTest {
           Remand(
             LocalDate.of(2020, 1, 5),
             LocalDate.of(2020, 1, 19),
-            aCharge().copy(offenceEndDate = null)
+            aCharge().copy(offenceEndDate = null, sentenceDate = LocalDate.of(2020, 1, 20))
           )
         )
       )
@@ -209,7 +221,7 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             ChargeAndEvents(
-              aCharge(),
+              aCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
               listOf(
                 CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
@@ -218,7 +230,7 @@ class RemandCalculationServiceTest {
               )
             ),
             ChargeAndEvents(
-              anUnrelatedCharge(),
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
               listOf(
                 CourtDate(date = LocalDate.of(2019, 7, 6), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 9, 24), type = CourtDateType.STOP),
@@ -235,34 +247,34 @@ class RemandCalculationServiceTest {
             Remand(
               LocalDate.of(2019, 7, 6),
               LocalDate.of(2020, 9, 24),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             ),
             Remand(
               LocalDate.of(2021, 6, 14),
               LocalDate.of(2021, 6, 14),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             ),
             Remand(
               LocalDate.of(2019, 7, 6),
               LocalDate.of(2020, 9, 24),
-              anUnrelatedCharge()
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             ),
             Remand(
               LocalDate.of(2021, 6, 14),
               LocalDate.of(2021, 6, 14),
-              anUnrelatedCharge()
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             )
           ),
           listOf(
             Remand(
               LocalDate.of(2019, 7, 6),
               LocalDate.of(2020, 9, 24),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             ),
             Remand(
               LocalDate.of(2021, 6, 14),
               LocalDate.of(2021, 6, 14),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2021, 6, 15)),
             )
           )
         )
@@ -275,14 +287,14 @@ class RemandCalculationServiceTest {
         RemandCalculation(
           listOf(
             ChargeAndEvents(
-              aCharge(),
+              aCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1)),
               listOf(
                 CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 3, 1), type = CourtDateType.STOP, final = true)
               )
             ),
             ChargeAndEvents(
-              anUnrelatedCharge(),
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1)),
               listOf(
                 CourtDate(date = LocalDate.of(2020, 2, 1), type = CourtDateType.START),
                 CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.STOP, final = true)
@@ -297,29 +309,28 @@ class RemandCalculationServiceTest {
             Remand(
               LocalDate.of(2020, 1, 1),
               LocalDate.of(2020, 2, 29),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1))
             ),
             Remand(
               LocalDate.of(2020, 2, 1),
               LocalDate.of(2020, 3, 31),
-              anUnrelatedCharge()
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1))
             ),
           ),
           listOf(
             Remand(
               LocalDate.of(2020, 1, 1),
               LocalDate.of(2020, 1, 31),
-              aCharge()
+              aCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1))
             ),
             Remand(
               LocalDate.of(2020, 2, 1),
               LocalDate.of(2020, 3, 31),
-              anUnrelatedCharge()
+              anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2020, 4, 1))
             )
           )
         )
       )
-
       assertThat(result.sentenceRemand.sumOf { it.days }).isEqualTo(91)
     }
 
@@ -332,6 +343,7 @@ class RemandCalculationServiceTest {
           offenceDate = LocalDate.of(2022, 11, 9),
           offenceEndDate = null,
           sentenceSequence = SENTENCE_SEQUENCE,
+          sentenceDate = LocalDate.of(2023, 1, 4),
           bookingId = 2,
           courtCaseRef = "ABC"
         )
@@ -342,6 +354,7 @@ class RemandCalculationServiceTest {
           offenceDate = LocalDate.of(2022, 11, 2),
           offenceEndDate = null,
           sentenceSequence = SECOND_SENTENCE_SEQUENCE,
+          sentenceDate = LocalDate.of(2023, 1, 4),
           bookingId = 2,
           courtCaseRef = "ABC"
         )
@@ -409,17 +422,162 @@ class RemandCalculationServiceTest {
           )
         )
       )
-
       assertThat(result.sentenceRemand.sumOf { it.days }).isEqualTo(60)
+    }
+
+    @Test
+    fun `Remand with intersecting sentence scenario 1`() {
+      val chargeOne = aCharge().copy(sentenceDate = LocalDate.of(2022, 1, 1))
+      val chargeTwo = anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 2, 1))
+      whenever(calculateReleaseDateService.calculateReleaseDate(any(), eq(chargeTwo.sentenceDate!!))).thenReturn(LocalDate.of(2021, 5, 2))
+
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          charges = listOf(
+            ChargeAndEvents(
+              chargeOne,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2022, 1, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            ChargeAndEvents(
+              chargeTwo,
+              listOf(
+                CourtDate(date = LocalDate.of(2021, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 2, 1), type = CourtDateType.STOP, final = true)
+              ),
+            ),
+          )
+        )
+      )
+      assertThat(
+        result.sentenceRemand
+      ).isEqualTo(
+        listOf(
+          Remand(from = LocalDate.of(2021, 1, 1), to = LocalDate.of(2021, 1, 31), chargeTwo),
+          Remand(from = LocalDate.of(2020, 1, 1), to = LocalDate.of(2020, 12, 31), chargeOne),
+          Remand(from = LocalDate.of(2021, 5, 3), to = LocalDate.of(2021, 12, 31), chargeOne),
+        )
+      )
+      verify(calculateReleaseDateService, times(1)).calculateReleaseDate(any(), any())
+    }
+    @Test
+    fun `Remand with intersecting sentence scenario 2`() {
+      val chargeOne = aCharge().copy(sentenceDate = LocalDate.of(2022, 1, 1))
+      val chargeTwo = anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 1, 1))
+      whenever(calculateReleaseDateService.calculateReleaseDate(any(), eq(chargeTwo.sentenceDate!!))).thenReturn(LocalDate.of(2021, 5, 2))
+
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          charges = listOf(
+            ChargeAndEvents(
+              chargeOne,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2022, 1, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            ChargeAndEvents(
+              chargeTwo,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 1, 1), type = CourtDateType.STOP, final = true)
+              ),
+            ),
+          )
+        )
+      )
+      assertThat(
+        result.sentenceRemand
+      ).isEqualTo(
+        listOf(
+          Remand(from = LocalDate.of(2020, 1, 1), to = LocalDate.of(2020, 12, 31), chargeTwo),
+          Remand(from = LocalDate.of(2021, 5, 3), to = LocalDate.of(2021, 12, 31), chargeOne)
+        )
+      )
+      verify(calculateReleaseDateService, times(1)).calculateReleaseDate(any(), any())
+    }
+
+    @Test
+    fun `Remand with intersecting sentence scenario 3`() {
+      val chargeOne = aCharge().copy(sentenceDate = LocalDate.of(2022, 1, 1))
+      val chargeTwo = anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 2, 1))
+      whenever(calculateReleaseDateService.calculateReleaseDate(any(), eq(chargeTwo.sentenceDate!!))).thenReturn(LocalDate.of(2022, 5, 2))
+
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          charges = listOf(
+            ChargeAndEvents(
+              chargeOne,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2022, 1, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            ChargeAndEvents(
+              chargeTwo,
+              listOf(
+                CourtDate(date = LocalDate.of(2021, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 2, 1), type = CourtDateType.STOP, final = true)
+              ),
+            ),
+          )
+        )
+      )
+      assertThat(
+        result.sentenceRemand
+      ).isEqualTo(
+        listOf(
+          Remand(from = LocalDate.of(2021, 1, 1), to = LocalDate.of(2021, 1, 31), chargeTwo),
+          Remand(from = LocalDate.of(2020, 1, 1), to = LocalDate.of(2020, 12, 31), chargeOne)
+        )
+      )
+      verify(calculateReleaseDateService, times(1)).calculateReleaseDate(any(), any())
+    }
+    @Test
+    fun `Remand with intersecting sentence scenario 4`() {
+      val chargeOne = aCharge().copy(sentenceDate = LocalDate.of(2022, 1, 1))
+      val chargeTwo = anUnrelatedCharge().copy(sentenceDate = LocalDate.of(2021, 1, 1))
+      whenever(calculateReleaseDateService.calculateReleaseDate(any(), eq(chargeTwo.sentenceDate!!))).thenReturn(LocalDate.of(2022, 5, 2))
+
+      val result = remandCalculationService.calculate(
+        RemandCalculation(
+          charges = listOf(
+            ChargeAndEvents(
+              chargeOne,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 4, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2022, 1, 1), type = CourtDateType.STOP, final = true)
+              )
+            ),
+            ChargeAndEvents(
+              chargeTwo,
+              listOf(
+                CourtDate(date = LocalDate.of(2020, 1, 1), type = CourtDateType.START),
+                CourtDate(date = LocalDate.of(2021, 1, 1), type = CourtDateType.STOP, final = true)
+              ),
+            ),
+          )
+        )
+      )
+      assertThat(
+        result.sentenceRemand
+      ).isEqualTo(
+        listOf(
+          Remand(from = LocalDate.of(2020, 1, 1), to = LocalDate.of(2020, 12, 31), chargeTwo)
+        )
+      )
+      verify(calculateReleaseDateService, times(1)).calculateReleaseDate(any(), any())
     }
   }
 
-  fun chargeAndEvents(courtDates: List<CourtDate>): List<ChargeAndEvents> {
-    return listOf(ChargeAndEvents(aCharge(), courtDates))
+  fun chargeAndEvents(courtDates: List<CourtDate>, sentenceDate: LocalDate): List<ChargeAndEvents> {
+    return listOf(ChargeAndEvents(aCharge().copy(sentenceDate = sentenceDate), courtDates))
   }
 
   fun aCharge(): Charge {
-    return Charge(1, offence, offenceDate, offenceEndDate, SENTENCE_SEQUENCE, BOOKING_ID, null)
+    return Charge(1, offence, offenceDate, BOOKING_ID, offenceEndDate, SENTENCE_SEQUENCE)
   }
 
   fun anUnrelatedCharge(): Charge {
@@ -427,10 +585,9 @@ class RemandCalculationServiceTest {
       2,
       unrelatedOffence,
       unrelatedOffenceDate,
-      unrelatedOffenceEndDate,
-      SECOND_SENTENCE_SEQUENCE,
       BOOKING_ID,
-      null
+      unrelatedOffenceEndDate,
+      SECOND_SENTENCE_SEQUENCE
     )
   }
 

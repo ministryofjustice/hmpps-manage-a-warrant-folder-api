@@ -13,7 +13,9 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import java.time.LocalDate
 
 @Service
-class RemandCalculationService {
+class RemandCalculationService(
+  private val sentenceRemandService: SentenceRemandService
+) {
 
   fun calculate(remandCalculation: RemandCalculation): RemandResult {
     if (remandCalculation.charges.isEmpty()) {
@@ -21,7 +23,7 @@ class RemandCalculationService {
     }
     val charges = combineRelatedCharges(remandCalculation)
     val chargeRemand = remandClock(charges)
-    val sentenceRemand = extractSentenceRemand(chargeRemand)
+    val sentenceRemand = sentenceRemandService.extractSentenceRemand(chargeRemand)
     return RemandResult(chargeRemand, sentenceRemand)
   }
 
@@ -44,34 +46,14 @@ class RemandCalculationService {
     return remand
   }
 
-  private fun extractSentenceRemand(remandPeriods: List<Remand>): List<Remand> {
-    val remands = mutableListOf<Remand>()
-    val sortedPeriods = remandPeriods.filter { it.charge.sentenceSequence != null }.sortedBy { it.from }
-    sortedPeriods.forEachIndexed { index, it ->
-      val charge = it.charge
-      if (!remandAlreadyCovered(remands, it)) {
-        val start = listOfNotNull(it.from, startOfLastRemand(remands)).max()
-        val nextPeriod = nextPeriodOrNull(index, sortedPeriods)
-        val end = if (nextRemandOverlaps(it, nextPeriod)) {
-          nextPeriod!!.from.minusDays(1)
-        } else {
-          it.to
-        }
-        remands.add(Remand(start, end, charge))
-      }
-    }
-    return remands
-  }
-  private fun startOfLastRemand(remands: List<Remand>): LocalDate? = remands.lastOrNull()?.from
-
-  private fun remandAlreadyCovered(remands: List<Remand>, it: Remand): Boolean = remands.isNotEmpty() && remands.last().to >= it.to
-
-  private fun nextRemandOverlaps(it: Remand, nextPeriod: Remand?): Boolean = nextPeriod != null && nextPeriod.from != it.from && nextPeriod.from < it.to
-
-  private fun nextPeriodOrNull(index: Int, sortedRemand: List<Remand>): Remand? = if (index == sortedRemand.size - 1) null else sortedRemand[index + 1]
-
   private fun combineRelatedCharges(remandCalculation: RemandCalculation): RemandCalculation {
-    val mapOfRelatedCharges = remandCalculation.charges.groupBy { RelatedCharge(it.charge.offenceDate, it.charge.offenceEndDate, it.charge.offence.code) }
+    val mapOfRelatedCharges = remandCalculation.charges.groupBy {
+      RelatedCharge(
+        it.charge.offenceDate,
+        it.charge.offenceEndDate,
+        it.charge.offence.code
+      )
+    }
     return RemandCalculation(
       mapOfRelatedCharges.map {
         ChargeAndEvents(pickMostAppropriateCharge(it.value), flattenCourtDates(it.value))
@@ -84,7 +66,8 @@ class RemandCalculationService {
     return relatedCharges.find { it.charge.sentenceSequence != null }?.charge ?: relatedCharges.first().charge
   }
 
-  private fun flattenCourtDates(relatedCharges: List<ChargeAndEvents>) = relatedCharges.flatMap { it.dates }.sortedBy { it.date }
+  private fun flattenCourtDates(relatedCharges: List<ChargeAndEvents>) =
+    relatedCharges.flatMap { it.dates }.sortedBy { it.date }
 
   private fun hasAnyRemandEvent(courtDates: List<CourtDate>) = courtDates.any { it.type == CourtDateType.START }
 

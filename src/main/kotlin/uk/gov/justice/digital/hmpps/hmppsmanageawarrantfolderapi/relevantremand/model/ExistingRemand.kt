@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 import java.time.LocalDate
 
-data class Remand(
-  override val from: LocalDate,
-  override val to: LocalDate,
-  val charge: Charge
-) : Period
+data class ExistingRemand(
+  val from: LocalDate,
+  val to: LocalDate,
+  val sentence: Int
+)
