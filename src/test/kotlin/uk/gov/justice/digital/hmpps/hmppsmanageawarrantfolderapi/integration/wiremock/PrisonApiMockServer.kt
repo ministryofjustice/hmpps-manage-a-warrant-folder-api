@@ -65,7 +65,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-12-13"
                     },
                     "bookingId":1
                  },
@@ -83,7 +84,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-12-13"
                     },
                     "bookingId":1
                  },
@@ -101,7 +103,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-12-13"
                     },
                     "bookingId":1
                  },
@@ -119,7 +122,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-12-13"
                     },
                     "bookingId":1
                  }
@@ -169,7 +173,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-18"
                     },
                     "bookingId":1
                  },
@@ -187,7 +192,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-18"
                     },
                     "bookingId":1
                  },
@@ -205,7 +211,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-18"
                     },
                     "bookingId":1
                  }
@@ -256,7 +263,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-25"
                     },
                     "bookingId":1
                  },
@@ -274,7 +282,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-25"
                     },
                     "bookingId":2
                  },
@@ -292,7 +301,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":1,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2015-09-25"
                     },
                     "bookingId":3
                  }
@@ -381,7 +391,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceDescription": "An offence",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -400,7 +411,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":2
+                       "sentenceSequence":2,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -779,7 +791,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -798,7 +811,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":2
+                       "sentenceSequence":2,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -817,7 +831,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -836,7 +851,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":2
+                       "sentenceSequence":2,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -855,7 +871,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":1
+                       "sentenceSequence":1,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  },
@@ -874,7 +891,8 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                        "offenceEndDate":"2019-05-21",
                        "guilty":false,
                        "courtCaseId":2,
-                       "sentenceSequence":2
+                       "sentenceSequence":2,
+                       "sentenceDate": "2021-06-15"
                     },
                     "bookingId":2
                  }

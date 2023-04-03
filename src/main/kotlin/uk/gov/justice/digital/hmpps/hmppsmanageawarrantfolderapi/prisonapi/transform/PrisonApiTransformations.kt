@@ -28,9 +28,10 @@ fun transform(results: List<PrisonApiCourtDateResult>, prisonerDetails: Prisoner
             it.key,
             transform(charge),
             charge.offenceDate,
+            it.value.first().bookingId,
             charge.offenceEndDate,
             charge.sentenceSequence,
-            it.value.first().bookingId,
+            charge.sentenceDate,
             charge.courtCaseRef,
             charge.courtLocation,
             charge.resultDescription

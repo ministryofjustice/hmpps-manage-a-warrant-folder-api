@@ -14,5 +14,6 @@ data class PrisonApiCharge(
   val courtCaseRef: String? = null,
   val courtLocation: String? = null,
   val sentenceSequence: Int? = null,
+  val sentenceDate: LocalDate? = null,
   val resultDescription: String? = null,
 )
