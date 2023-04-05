@@ -23,7 +23,7 @@ class RemandCalculationService(
     }
     val charges = combineRelatedCharges(remandCalculation)
     val chargeRemand = remandClock(charges)
-    val sentenceRemand = sentenceRemandService.extractSentenceRemand(chargeRemand)
+    val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand)
     return RemandResult(chargeRemand, sentenceRemand)
   }
 
@@ -54,8 +54,8 @@ class RemandCalculationService(
         it.charge.offence.code
       )
     }
-    return RemandCalculation(
-      mapOfRelatedCharges.map {
+    return remandCalculation.copy(
+      charges = mapOfRelatedCharges.map {
         ChargeAndEvents(pickMostAppropriateCharge(it.value), flattenCourtDates(it.value))
       }
     )

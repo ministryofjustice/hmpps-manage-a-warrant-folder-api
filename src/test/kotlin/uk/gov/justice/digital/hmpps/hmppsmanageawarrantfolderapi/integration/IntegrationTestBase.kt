@@ -7,11 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.wiremock.CalculateReleaseDatesApiExtension
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.wiremock.PrisonApiExtension
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
-@ExtendWith(PrisonApiExtension::class)
+@ExtendWith(PrisonApiExtension::class, CalculateReleaseDatesApiExtension::class)
 abstract class IntegrationTestBase {
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")

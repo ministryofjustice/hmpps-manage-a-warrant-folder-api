@@ -15,6 +15,7 @@ import java.time.LocalDate
 fun transform(results: List<PrisonApiCourtDateResult>, prisonerDetails: PrisonerDetails): RemandCalculation {
   val earliestActiveOffenceDate: LocalDate = findEarliestActiveOffenceDate(results, prisonerDetails)
   return RemandCalculation(
+    prisonerDetails.offenderNo,
     results
       .filter { it.date.isAfter(earliestActiveOffenceDate) }
       .groupBy { it.charge.chargeId }
