@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.service.CalculateReleaseDateService
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentencePeriod
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentenceRemandLoopTracker
@@ -11,7 +12,7 @@ class SentenceRemandService(
   private val calculateReleaseDateService: CalculateReleaseDateService
 ) {
 
-  fun extractSentenceRemand(remandPeriods: List<Remand>): List<Remand> {
+  fun extractSentenceRemand(prisonerId: String, remandPeriods: List<Remand>): List<Remand> {
     val loopTracker = SentenceRemandLoopTracker(remandPeriods)
     for (entry in loopTracker.sentenceDateToPeriodMap.entries.sortedBy { it.key }) {
       loopTracker.startNewSentenceDateLoop(entry)
@@ -19,7 +20,7 @@ class SentenceRemandService(
       for (date in loopTracker.importantDates) {
         if (loopTracker.shouldCalculateAReleaseDate(date)) {
           log.info("calculating release date for sentence on date $date")
-          val sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(loopTracker.final, date)
+          val sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, date)
           loopTracker.periodsServingSentence.add(SentencePeriod(date, sentenceReleaseDate))
         }
         val next = loopTracker.findNextPeriod(date)

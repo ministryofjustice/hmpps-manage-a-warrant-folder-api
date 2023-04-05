@@ -8,4 +8,8 @@ management.endpoint:
 # Wiremock prison-api
 prison:
   api:
-    url: http://localhost:8332
+    url: http://localhost:8332/prison-api
+
+calculate-release-dates:
+  api:
+    url: http://localhost:8333/calculate-release-dates-api
