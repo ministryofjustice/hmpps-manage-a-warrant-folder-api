@@ -38,7 +38,7 @@ class CalculateReleaseDatesApiMockServer : WireMockServer(WIREMOCK_PORT) {
 
   fun stubIntersectingSentence() {
     stubFor(
-      post("/calculate-release-dates-api/api/calculation/relevant-remand/${PrisonApiExtension.INTERSECTING_PRISONER}")
+      post("/calculate-release-dates-api/calculation/relevant-remand/${PrisonApiExtension.INTERSECTING_PRISONER}")
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
