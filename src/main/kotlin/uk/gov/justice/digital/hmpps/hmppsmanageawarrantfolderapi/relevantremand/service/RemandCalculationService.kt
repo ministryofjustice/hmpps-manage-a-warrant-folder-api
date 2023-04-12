@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
@@ -23,7 +24,8 @@ class RemandCalculationService(
     }
     val charges = combineRelatedCharges(remandCalculation)
     val chargeRemand = remandClock(charges)
-    val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand)
+    val sentenceDates = remandCalculation.charges.mapNotNull { it.charge.sentenceDate }.distinct()
+    val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand, sentenceDates)
     return RemandResult(chargeRemand, sentenceRemand)
   }
 
