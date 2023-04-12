@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,10 +19,9 @@ class RemandCalculationServiceTest {
   private val sentenceRemandService = SentenceRemandService(calculateReleaseDateService)
   private val remandCalculationService = RemandCalculationService(sentenceRemandService)
 
-
   @ParameterizedTest
   @CsvFileSource(resources = ["/data/tests.csv"], numLinesToSkip = 1)
-  fun `Test Examples`(exampleName: String,  error: String?) {
+  fun `Test Examples`(exampleName: String, error: String?) {
     log.info("Testing example $exampleName")
 
     val example = TestUtil.objectMapper().readValue(ClassPathResource("/data/RemandCalculation/$exampleName.json").file, TestExample::class.java)
