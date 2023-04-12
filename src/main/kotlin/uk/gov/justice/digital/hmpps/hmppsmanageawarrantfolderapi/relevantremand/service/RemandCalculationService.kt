@@ -23,7 +23,8 @@ class RemandCalculationService(
     }
     val charges = combineRelatedCharges(remandCalculation)
     val chargeRemand = remandClock(charges)
-    val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand)
+    val sentenceDates = remandCalculation.charges.mapNotNull { it.charge.sentenceDate }.distinct()
+    val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand, sentenceDates)
     return RemandResult(chargeRemand, sentenceRemand)
   }
 
