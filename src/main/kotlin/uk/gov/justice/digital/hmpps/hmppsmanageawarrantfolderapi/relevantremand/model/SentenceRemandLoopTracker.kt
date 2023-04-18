@@ -7,7 +7,7 @@ import java.time.LocalDate
 */
 class SentenceRemandLoopTracker(
   remandPeriods: List<Remand>,
-  private val sentenceDates: List<LocalDate>
+  private val sentences: List<Sentence>
 ) {
   /* All periods that are linked to a sentence */
   private val allPeriods = remandPeriods.filter { it.charge.sentenceSequence != null && it.charge.sentenceDate != null }
@@ -16,9 +16,9 @@ class SentenceRemandLoopTracker(
   val sentenceDateToPeriodMap = allPeriods.groupBy { it.charge.sentenceDate }.toMutableMap()
 
   init {
-    sentenceDates.forEach {
-      if (!sentenceDateToPeriodMap.containsKey(it)) {
-        sentenceDateToPeriodMap[it] = emptyList()
+    sentences.forEach {
+      if (!sentenceDateToPeriodMap.containsKey(it.sentenceDate)) {
+        sentenceDateToPeriodMap[it.sentenceDate] = emptyList()
       }
     }
   }
@@ -57,7 +57,7 @@ class SentenceRemandLoopTracker(
 
   /* Can we open a new period, does the period intersected a confirmed date. */
   fun doesDateIntersectWithEstablishedRemandOrSentence(date: LocalDate): Boolean {
-    return !(!sentenceDates.contains(date) && (final + periodsServingSentence).none { it.overlapsStartInclusive(date.plusDays(1)) })
+    return !(!sentences.any { it.sentenceDate == date } && (final + periodsServingSentence).none { it.overlapsStartInclusive(date.plusDays(1)) })
   }
 
   /* Should the current period be closed? */
@@ -67,6 +67,6 @@ class SentenceRemandLoopTracker(
 
   /* If we've reached a sentence period then calculate the release dates for it. */
   fun shouldCalculateAReleaseDate(date: LocalDate): Boolean {
-    return sentenceDates.contains(date) && sentenceDates.max() != date && periodsServingSentence.none { it.from == date }
+    return sentences.any { it.sentenceDate == date } && sentences.maxOf { it.sentenceDate } != date && periodsServingSentence.none { it.from == date }
   }
 }

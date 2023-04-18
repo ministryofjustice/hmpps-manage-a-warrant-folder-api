@@ -13,6 +13,7 @@ import org.springframework.core.io.ClassPathResource
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.TestUtil
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.service.CalculateReleaseDateService
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 
 class RemandCalculationServiceTest {
   private val calculateReleaseDateService = mock<CalculateReleaseDateService>()
@@ -27,12 +28,12 @@ class RemandCalculationServiceTest {
     val example = TestUtil.objectMapper().readValue(ClassPathResource("/data/RemandCalculation/$exampleName.json").file, TestExample::class.java)
 
     example.releaseDates.forEach {
-      log.info("Stubbing release dates for $exampleName: ${it.sentenceAt} - ${it.release}")
+      log.info("Stubbing release dates for $exampleName: $it")
       whenever(
         calculateReleaseDateService.calculateReleaseDate(
           eq(example.remandCalculation.prisonerId),
           any(),
-          eq(it.sentenceAt)
+          eq(Sentence(it.sentenceSequence, it.sentenceAt, it.bookingId))
         )
       ).thenReturn(it.release)
     }

@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 import java.time.LocalDate
 
 @Service
@@ -23,7 +24,10 @@ class RemandCalculationService(
     }
     val charges = combineRelatedCharges(remandCalculation)
     val chargeRemand = remandClock(charges)
-    val sentenceDates = remandCalculation.charges.mapNotNull { it.charge.sentenceDate }.distinct()
+    val sentenceDates = remandCalculation.charges
+      .filter { it.charge.sentenceDate != null && it.charge.sentenceSequence != null }
+      .map { Sentence(it.charge.sentenceSequence!!, it.charge.sentenceDate!!, it.charge.bookingId) }
+      .distinctBy { it.sentenceDate }
     val sentenceRemand = sentenceRemandService.extractSentenceRemand(remandCalculation.prisonerId, chargeRemand, sentenceDates)
     return RemandResult(chargeRemand, sentenceRemand)
   }

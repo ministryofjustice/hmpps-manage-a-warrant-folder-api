@@ -9,6 +9,8 @@ data class TestExample(
 )
 
 data class ReleaseDates(
+  val bookingId: Long,
+  val sentenceSequence: Int,
   val sentenceAt: LocalDate,
   val release: LocalDate,
 )
