@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.model
 
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 
 data class RelevantRemandCalculationRequest(
   val relevantRemands: List<RelevantRemand>,
-  val sentenceDate: LocalDate
+  val sentence: Sentence
 )

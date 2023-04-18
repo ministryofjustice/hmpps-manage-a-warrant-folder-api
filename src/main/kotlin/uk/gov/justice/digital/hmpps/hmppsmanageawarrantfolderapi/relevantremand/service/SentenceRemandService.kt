@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.service.CalculateReleaseDateService
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentencePeriod
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentenceRemandLoopTracker
 import java.time.LocalDate
@@ -14,19 +15,20 @@ class SentenceRemandService(
   private val calculateReleaseDateService: CalculateReleaseDateService
 ) {
 
-  fun extractSentenceRemand(prisonerId: String, remandPeriods: List<Remand>, sentenceDates: List<LocalDate>): List<Remand> {
-    val loopTracker = SentenceRemandLoopTracker(remandPeriods, sentenceDates)
+  fun extractSentenceRemand(prisonerId: String, remandPeriods: List<Remand>, sentences: List<Sentence>): List<Remand> {
+    val loopTracker = SentenceRemandLoopTracker(remandPeriods, sentences)
     for (entry in loopTracker.sentenceDateToPeriodMap.entries.sortedBy { it.key }) {
       loopTracker.startNewSentenceDateLoop(entry)
       var current: Remand? = null
       for (date in loopTracker.importantDates) {
         if (loopTracker.shouldCalculateAReleaseDate(date)) {
-          log.info("calculating release date for sentence on date $date")
+          val sentence = sentences.find { it.sentenceDate == date }!!
+          log.info("calculating release date for $sentence")
           val sentenceReleaseDate: LocalDate
           try {
-            sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, date)
+            sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, sentence)
           } catch (e: Exception) {
-            throw UnsupportedCalculationException("Error calling CRD service", e)
+            throw UnsupportedCalculationException("Error calling CRD service $sentence", e)
           }
           loopTracker.periodsServingSentence.add(SentencePeriod(date, sentenceReleaseDate))
         }
