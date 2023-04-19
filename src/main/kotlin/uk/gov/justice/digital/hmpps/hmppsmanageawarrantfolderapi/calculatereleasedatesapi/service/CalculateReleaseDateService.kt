@@ -28,11 +28,13 @@ class CalculateReleaseDateService(
       throw UnsupportedCalculationException("Error calling CRD service $sentence", e)
     }
     if (result.validationMessages.isNotEmpty()) {
-      throw UnsupportedCalculationException("Validation error from calling CRD service $sentence, \n ${
+      throw UnsupportedCalculationException(
+        "Validation error from calling CRD service $sentence, \n ${
         result.validationMessages.joinToString(
           separator = "\n"
         ) { it.message }
-      }")
+        }"
+      )
     }
     return result.releaseDate!!
   }

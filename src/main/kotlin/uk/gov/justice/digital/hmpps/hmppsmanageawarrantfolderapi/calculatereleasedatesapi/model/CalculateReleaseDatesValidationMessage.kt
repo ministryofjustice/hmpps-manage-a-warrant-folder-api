@@ -2,5 +2,4 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculaterelea
 
 data class CalculateReleaseDatesValidationMessage(
   val message: String
-  )
-
+)

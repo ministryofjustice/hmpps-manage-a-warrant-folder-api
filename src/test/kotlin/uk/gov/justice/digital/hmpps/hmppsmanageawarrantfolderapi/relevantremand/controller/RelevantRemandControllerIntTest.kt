@@ -140,10 +140,6 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
       .expectBody(ErrorResponse::class.java)
       .returnResult().responseBody!!
 
-
     assertThat(result.userMessage).contains("Unsupported sentence type 2020 Uknown")
-
-
-
   }
 }

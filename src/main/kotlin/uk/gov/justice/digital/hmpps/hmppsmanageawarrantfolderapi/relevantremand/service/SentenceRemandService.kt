@@ -3,12 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.service.CalculateReleaseDateService
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentencePeriod
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentenceRemandLoopTracker
-import java.time.LocalDate
 
 @Service
 class SentenceRemandService(
