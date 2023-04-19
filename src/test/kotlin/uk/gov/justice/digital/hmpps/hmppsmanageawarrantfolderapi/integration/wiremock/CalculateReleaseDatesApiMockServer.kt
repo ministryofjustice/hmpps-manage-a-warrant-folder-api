@@ -20,6 +20,7 @@ class CalculateReleaseDatesApiExtension : BeforeAllCallback, AfterAllCallback, B
   override fun beforeAll(context: ExtensionContext) {
     calculateReleaseDatesApi.start()
     calculateReleaseDatesApi.stubIntersectingSentence()
+    calculateReleaseDatesApi.stubCrdValidation()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -46,6 +47,22 @@ class CalculateReleaseDatesApiMockServer : WireMockServer(WIREMOCK_PORT) {
               """
              { "releaseDate": "2021-04-01" }
                
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
+
+  fun stubCrdValidation() {
+    stubFor(
+      post("/calculate-release-dates-api/calculation/relevant-remand/${PrisonApiExtension.CRD_VALIDATION_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {"releaseDate":null,"validationMessages":[{"message":"Unsupported sentence type 2020 Uknown"}]}
               """.trimIndent()
             )
             .withStatus(200)

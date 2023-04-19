@@ -23,13 +23,7 @@ class SentenceRemandService(
       for (date in loopTracker.importantDates) {
         if (loopTracker.shouldCalculateAReleaseDate(date)) {
           val sentence = sentences.find { it.sentenceDate == date }!!
-          log.info("calculating release date for $sentence")
-          val sentenceReleaseDate: LocalDate
-          try {
-            sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, sentence)
-          } catch (e: Exception) {
-            throw UnsupportedCalculationException("Error calling CRD service $sentence", e)
-          }
+          val sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, sentence)
           loopTracker.periodsServingSentence.add(SentencePeriod(date, sentenceReleaseDate))
         }
         val next = loopTracker.findNextPeriod(date)
