@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandResult
@@ -124,5 +126,20 @@ class RelevantRemandControllerIntTest : IntegrationTestBase() {
     assertThat(result.sentenceRemand[2].from).isEqualTo(LocalDate.of(2021, 4, 2))
     assertThat(result.sentenceRemand[2].to).isEqualTo(LocalDate.of(2021, 12, 31))
     assertThat(result.sentenceRemand[2].charge.sentenceSequence).isEqualTo(3)
+  }
+
+  @Test
+  fun `Run calculation for an intersecting sentence where CRD returns validation messages`() {
+    val result = webTestClient.post()
+      .uri("/relevant-remand/${PrisonApiExtension.CRD_VALIDATION_PRISONER}")
+      .accept(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGE_DIGITAL_WARRANT")))
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody(ErrorResponse::class.java)
+      .returnResult().responseBody!!
+
+    assertThat(result.userMessage).contains("Unsupported sentence type 2020 Uknown")
   }
 }

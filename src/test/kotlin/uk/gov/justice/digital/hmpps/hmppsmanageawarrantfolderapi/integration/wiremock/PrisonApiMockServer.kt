@@ -18,6 +18,7 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
     const val IMPRISONED_PRISONER = "IMP"
     const val BAIL_PRISONER = "BAIL"
     const val INTERSECTING_PRISONER = "INTERSE"
+    const val CRD_VALIDATION_PRISONER = "CRDVAL"
     const val RELATED_PRISONER = "RELATED"
     const val MULTIPLE_OFFENCES_PRISONER = "MULTI"
   }
@@ -28,6 +29,7 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
     prisonApi.stubRelatedOffencesPrisoner()
     prisonApi.stubMultipleOffences()
     prisonApi.stubIntersectingSentence()
+    prisonApi.stubCrdValidation()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -356,6 +358,127 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
                 {
                   "bookingId": 1,
                   "offenderNo": "${PrisonApiExtension.INTERSECTING_PRISONER}"
+                }
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+  }
+  fun stubCrdValidation() {
+    stubFor(
+      get("/prison-api/api/digital-warrant/court-date-results/${PrisonApiExtension.CRD_VALIDATION_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+              [
+             {
+                "id":499876018,
+                "date":"2020-01-01",
+                "resultCode":"4531",
+                "resultDescription":"Remand in Custody (Bail Refused)",
+                "resultDispositionCode":"I",
+                "charge":{
+                   "chargeId":3933931,
+                   "offenceCode":"WR91001",
+                   "offenceStatue":"WR91",
+                   "offenceDescription":"Abstract water without a licence",
+                   "offenceDate":"2019-01-01",
+                   "guilty":false,
+                   "courtCaseId":1564627,
+                   "courtCaseRef":"C1",
+                   "courtLocation":"Birmingham Crown Court",
+                   "sentenceSequence":3,
+                   "sentenceDate":"2022-01-01",
+                   "resultDescription":"Imprisonment"
+                },
+                "bookingId":1
+             },
+             {
+                "id":499876020,
+                "date":"2021-01-01",
+                "resultCode":"4531",
+                "resultDescription":"Remand in Custody (Bail Refused)",
+                "resultDispositionCode":"I",
+                "charge":{
+                   "chargeId":3933932,
+                   "offenceCode":"CS00011",
+                   "offenceStatue":"CS00",
+                   "offenceDescription":"Act as child minder while disqualified from registration as a child minder",
+                   "offenceDate":"2019-01-01",
+                   "guilty":false,
+                   "courtCaseId":1564628,
+                   "courtCaseRef":"C2",
+                   "courtLocation":"Birmingham Crown Court",
+                   "sentenceSequence":4,
+                   "sentenceDate":"2021-02-01",
+                   "resultDescription":"Imprisonment"
+                },
+                "bookingId":1
+             },
+             {
+                "id":499876021,
+                "date":"2021-02-01",
+                "resultCode":"1002",
+                "resultDescription":"Imprisonment",
+                "resultDispositionCode":"F",
+                "charge":{
+                   "chargeId":3933932,
+                   "offenceCode":"CS00011",
+                   "offenceStatue":"CS00",
+                   "offenceDescription":"Act as child minder while disqualified from registration as a child minder",
+                   "offenceDate":"2019-01-01",
+                   "guilty":false,
+                   "courtCaseId":1564628,
+                   "courtCaseRef":"C2",
+                   "courtLocation":"Birmingham Crown Court",
+                   "sentenceSequence":4,
+                   "sentenceDate":"2021-02-01",
+                   "resultDescription":"Imprisonment"
+                },
+                "bookingId":1
+             },
+             {
+                "id":499876019,
+                "date":"2022-01-01",
+                "resultCode":"1002",
+                "resultDescription":"Imprisonment",
+                "resultDispositionCode":"F",
+                "charge":{
+                   "chargeId":3933931,
+                   "offenceCode":"WR91001",
+                   "offenceStatue":"WR91",
+                   "offenceDescription":"Abstract water without a licence",
+                   "offenceDate":"2019-01-01",
+                   "guilty":false,
+                   "courtCaseId":1564627,
+                   "courtCaseRef":"C1",
+                   "courtLocation":"Birmingham Crown Court",
+                   "sentenceSequence":3,
+                   "sentenceDate":"2022-01-01",
+                   "resultDescription":"Imprisonment"
+                },
+                "bookingId":1
+             }
+          ]
+              """.trimIndent()
+            )
+            .withStatus(200)
+        )
+    )
+
+    stubFor(
+      get("/prison-api/api/offenders/${PrisonApiExtension.CRD_VALIDATION_PRISONER}")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """
+                {
+                  "bookingId": 1,
+                  "offenderNo": "${PrisonApiExtension.CRD_VALIDATION_PRISONER}"
                 }
               """.trimIndent()
             )

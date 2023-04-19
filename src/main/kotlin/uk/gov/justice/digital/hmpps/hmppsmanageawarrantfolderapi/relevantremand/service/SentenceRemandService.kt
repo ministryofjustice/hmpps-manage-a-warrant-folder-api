@@ -3,12 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.calculatereleasedatesapi.service.CalculateReleaseDateService
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.UnsupportedCalculationException
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentencePeriod
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.SentenceRemandLoopTracker
-import java.time.LocalDate
 
 @Service
 class SentenceRemandService(
@@ -23,13 +21,7 @@ class SentenceRemandService(
       for (date in loopTracker.importantDates) {
         if (loopTracker.shouldCalculateAReleaseDate(date)) {
           val sentence = sentences.find { it.sentenceDate == date }!!
-          log.info("calculating release date for $sentence")
-          val sentenceReleaseDate: LocalDate
-          try {
-            sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, sentence)
-          } catch (e: Exception) {
-            throw UnsupportedCalculationException("Error calling CRD service $sentence", e)
-          }
+          val sentenceReleaseDate = calculateReleaseDateService.calculateReleaseDate(prisonerId, loopTracker.final, sentence)
           loopTracker.periodsServingSentence.add(SentencePeriod(date, sentenceReleaseDate))
         }
         val next = loopTracker.findNextPeriod(date)
