@@ -16,7 +16,6 @@ class CalculateReleaseDateService(
 ) {
 
   fun calculateReleaseDate(prisonerId: String, remand: List<Remand>, sentence: Sentence): LocalDate {
-    log.info("Calculating release dates for $sentence")
     val request = RelevantRemandCalculationRequest(
       remand.map { RelevantRemand(it.from, it.to, it.days.toInt(), it.charge.sentenceSequence!!) },
       sentence
@@ -25,7 +24,7 @@ class CalculateReleaseDateService(
     try {
       result = calculateReleaseDatesApiClient.calculateReleaseDates(prisonerId, request)
     } catch (e: Exception) {
-      throw UnsupportedCalculationException("Error calling CRD service $sentence", e)
+      throw UnsupportedCalculationException("Error calling CRD service $request", e)
     }
     if (result.validationMessages.isNotEmpty()) {
       throw UnsupportedCalculationException(
