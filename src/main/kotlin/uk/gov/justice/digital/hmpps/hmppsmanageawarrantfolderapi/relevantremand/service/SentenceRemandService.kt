@@ -44,7 +44,10 @@ class SentenceRemandService(
         // Should the current period be closed?
         if (loopTracker.shouldCloseCurrentPeriod(date, current)) {
           // Period being closed by another period
-          loopTracker.final.add(current!!.copy(to = date.minusDays(1)))
+          val end = date.minusDays(1)
+          if (end.isAfter(current!!.from)) {
+            loopTracker.final.add(current.copy(to = end))
+          }
           current = null
         }
         if (current?.to == date) {
