@@ -5,7 +5,9 @@ import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Charge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.ChargeAndEvents
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDate
-import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType.CONTINUE
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType.START
+import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.CourtDateType.STOP
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RelatedCharge
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.Remand
 import uk.gov.justice.digital.hmpps.hmppsmanageawarrantfolderapi.relevantremand.model.RemandCalculation
@@ -38,10 +40,10 @@ class RemandCalculationService(
       if (hasAnyRemandEvent(chargeAndEvent.dates)) {
         var from: LocalDate? = null
         chargeAndEvent.dates.forEach {
-          if (it.type == CourtDateType.START && from == null) {
+          if (listOf(START, CONTINUE).contains(it.type) && from == null) {
             from = it.date
           }
-          if (it.type == CourtDateType.STOP && from != null) {
+          if (it.type == STOP && from != null) {
             remand.add(Remand(from!!, getToDate(it), chargeAndEvent.charge))
             from = null
           }
@@ -74,7 +76,7 @@ class RemandCalculationService(
   private fun flattenCourtDates(relatedCharges: List<ChargeAndEvents>) =
     relatedCharges.flatMap { it.dates }.sortedBy { it.date }
 
-  private fun hasAnyRemandEvent(courtDates: List<CourtDate>) = courtDates.any { it.type == CourtDateType.START }
+  private fun hasAnyRemandEvent(courtDates: List<CourtDate>) = courtDates.any { listOf(START, CONTINUE).contains(it.type) }
 
   private fun getToDate(courtDate: CourtDate) = if (courtDate.final) courtDate.date.minusDays(1) else courtDate.date
 }
